@@ -230,6 +230,12 @@ datalist {
     background-color: #555;
 }
 
+.addbutton{
+    height: 20px;
+    background-color: red;
+    width: 20px;
+}
+
 @media (max-width: 768px) {
     .content {
         grid-template-columns: 1fr;
