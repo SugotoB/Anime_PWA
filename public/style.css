@@ -1,0 +1,266 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    background-color: rgb(13, 255, 65);
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+.sidebar {
+    min-width: 50px;
+    background-color: grey;
+    padding: 1rem;
+    color: white;
+    transition: 0.3s ease-in-out;
+    overflow-y: auto;
+}
+
+.sidebar.active {
+    min-width: 300px;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 2rem;
+}
+
+.sidebar ul li {
+    margin-bottom: 1rem;
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.sidebar ul li a:hover {
+    text-decoration: underline;
+}
+
+#buttonicon {
+    cursor: pointer;
+    position: fixed;
+    background-color: red;
+}
+
+datalist {
+    appearance: none;
+    height: 100%;
+    width: 100%;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.header {
+    padding: 1rem;
+    background-color: #dbd3d3;
+    color: #000;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.content {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 3fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    flex: 1;
+    background-color: blue;
+}
+
+.librarycontainer {
+    background-color: lightgray;
+    border-radius: 5px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+.search-form {
+    display: flex;
+    background-color: white;
+    border-radius: 5px;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.search-form input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 5px 0 0 5px;
+}
+
+.search-form button {
+    padding: 0.5rem 1rem;
+    background-color: #333;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 0 5px 5px 0;
+}
+
+.search-form button:hover {
+    background-color: #555;
+}
+
+.animelistcontainer {
+    background-color: blue;
+    width: 100%;
+    min-height: 100px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.animelistcontainer > #animelist {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    gap: 20px;
+}
+
+.animelistcontainer > #animelist > li {
+    list-style: none;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.anime-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    width: 200px;
+    text-align: center;
+}
+
+.anime-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.anime-card h3 {
+    font-size: 1.2rem;
+    margin-top: 10px;
+}
+
+.description-button {
+    margin-top: 10px;
+    padding: 0.5rem;
+    background-color: #333;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.description-button:hover {
+    background-color: #555;
+}
+
+.personallist {
+    background-color: rgb(173, 150, 150);
+    border-radius: 5px;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.personallist ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+}
+
+.popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+}
+
+.popup-close {
+    background-color: #333;
+    color: white;
+    padding: 0.5rem;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.popup-close:hover {
+    background-color: #555;
+}
+
+.addbutton{
+    height: 20px;
+    background-color: red;
+    width: 20px;
+}
+
+@media (max-width: 768px) {
+    .content {
+        grid-template-columns: 1fr;
+    }
+
+    .search-form {
+        grid-column: 1 / 2;
+    }
+
+    .anime-card {
+        width: 100%;
+    }
+}
+
+
+#next{
+    height: 100px;
+    background-color: red;
+    width: 100px;
+}
+#before{
+    height: 100px;
+    background-color: blue;
+    width: 100px;
+}
+
+
+

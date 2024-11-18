@@ -75,7 +75,7 @@ function displayAnime(animes) {
         addbutton.addEventListener('click', () => {
             addbutton.disabled = true;
         
-            fetch('http://localhost:3000/addinganime', {
+            fetch('/api/addinganime', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

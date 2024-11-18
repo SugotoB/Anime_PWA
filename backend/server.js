@@ -11,9 +11,9 @@ app.use(cors());
 app.use(express.json());
 app.use(parser.urlencoded({extended: true}));
 
-app.use(express.static(path.join(__dirname, 'Anime_PWA', 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
-const db = new sqlite3.Database('Anime_PWA/backend/database/ListUser.db', (err) => {
+const db = new sqlite3.Database(path.join(__dirname, 'database', 'ListUser.db'), (err) => {
     if (err) {
         console.error('Db failed opening', err);
     } else {
@@ -24,7 +24,7 @@ const db = new sqlite3.Database('Anime_PWA/backend/database/ListUser.db', (err) 
 
 
  
-app.post('/addinganime', (request, response) => {
+app.post('/api/addinganime', (request, response) => {
     const { title, description, anime_episodes } = request.body;
 
     const query = 'INSERT INTO listing (title, description, anime_episodes) VALUES (?, ?, ?)';

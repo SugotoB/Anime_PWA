@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+  <div class="container">
+
+    <aside class="sidebar">
+      <div id="buttonicon">>></div>
+        <ul>
+            <li><a href="#page">Lorem.</a></li>
+            <li><a href="#page">Lorem.</a></li>
+            <li><a href="#page">Lorem.</a></li>
+        </ul>
+    </aside>
+
+    <div class="main-content">
+        <header class="header">
+            <div class="logo">MyLogo</div>
+        </header>
+
+        <div class="content">
+            <div class="librarycontainer">
+                <form action="search" class="search-form">
+                    <input type="text" id="input_search" placeholder="Type your favourite anime...">
+                    <button type="submit">Search</button>
+                </form>
+
+                <div class="animelistcontainer">
+                    <ul id="animelist">
+                        <!-- dynamic addition here -->
+                    </ul>
+                </div>
+            </div>
+
+            <div class="personallist">
+                <ul>
+                    <li><div>User 1</div></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+    <button id="next">next</button>
+    <button id="before">back</button>
+<script src="/clientscripts/main.js"></script>
+</body>
+</html>
+
