@@ -54,11 +54,7 @@ body {
     background-color: red;
 }
 
-datalist {
-    appearance: none;
-    height: 100%;
-    width: 100%;
-}
+
 
 .main-content {
     display: flex;
@@ -184,16 +180,24 @@ datalist {
     background-color: #555;
 }
 
-.personallist {
+.personallist_container {
     background-color: rgb(173, 150, 150);
     border-radius: 5px;
     padding: 1rem;
+    height: 90%;
     overflow-y: auto;
 }
 
-.personallist ul {
+#personallist {
     list-style-type: none;
     padding: 0;
+}
+
+#personallist > li > div { 
+    height: 100px;
+    width: 100%;
+    background-color: red;
+    border-radius: 10px;
 }
 
 .popup {

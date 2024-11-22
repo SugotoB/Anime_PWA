@@ -42,6 +42,118 @@ beforebutton.addEventListener('click', function() {
 
 
 
+
+async function displayList() {
+    try {
+        const response = await fetch('/api/userlist');
+        const userlist = await response.json();
+
+        const container = document.getElementById('personallist');
+        container.innerHTML = ''; // Clear the current list
+
+        userlist.forEach((anime) => {
+            const listItem = document.createElement('li');
+            const animeDiv = document.createElement('div');
+            animeDiv.classList.add('anime-item-container');
+
+            // Anime Title
+            const animeTitle = document.createElement('h3');
+            animeTitle.textContent = anime.title;
+            animeDiv.appendChild(animeTitle);
+
+            // Progress Section
+            const progressSection = document.createElement('div');
+            progressSection.classList.add('progress-section');
+
+            const currentLabel = document.createElement('label');
+            currentLabel.textContent = 'Progress: ';
+            progressSection.appendChild(currentLabel);
+
+            const currentInput = document.createElement('input');
+            currentInput.type = 'number';
+            currentInput.min = 0;
+            currentInput.max = anime.anime_episodes || 0;
+            currentInput.value = anime.user_progress || 0; 
+            currentInput.classList.add('progress-input');
+            progressSection.appendChild(currentInput);
+
+            const totalEpisodes = document.createElement('span');
+            totalEpisodes.textContent = ` / ${anime.anime_episodes || 'N/A'}`;
+            progressSection.appendChild(totalEpisodes);
+
+            animeDiv.appendChild(progressSection);
+
+            // Delete Button
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('delete-button');
+
+            deleteButton.addEventListener('click', async () => {
+                if (confirm(`Do you want to delete'${anime.title}'from your list?`)) {
+                    try {
+                        const response = await fetch('/api/deleteanime', {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ id: anime.id }),
+                        });
+
+                        if (response.ok) {
+                            container.removeChild(listItem); 
+                            console.log('Anime deleted successfully');
+                        } else {
+                            console.error('Failed to delete anime');
+                        }
+                    } catch (error) {
+                        console.error('Error deleting anime:', error);
+                    }
+                }
+            });
+            
+
+            //update progress
+            
+            currentInput.addEventListener('change', async (update) => {
+                const newProgress = update.target.value; 
+                const animeId = anime.id; 
+            
+                try {
+                    const response = await fetch('/api/updateprog', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: animeId, user_progress: parseInt(newProgress, 10) }),
+                    });
+            
+                    if (response.ok) {
+                        console.log('Progress updated successfully!');
+                    } else {
+                        const errorData = await response.json();
+                        console.error('Failed to update progress:', errorData.error);
+                    }
+                } catch (error) {
+                    console.error('Error updating progress:', error);
+                }
+            });
+            
+
+            animeDiv.appendChild(deleteButton);
+
+
+            listItem.appendChild(animeDiv);
+            container.appendChild(listItem);
+        });
+    } catch (error) {
+        console.error('Error fetching user list:', error);
+    }
+}
+
+
+
+
+
 function displayAnime(animes) {
     const listContainer = document.getElementById('animelist');
     listContainer.innerHTML = ''; 
@@ -96,7 +208,9 @@ function displayAnime(animes) {
             })
             .finally(() => {
                 addbutton.disabled = false;
+
             });
+             displayList();
         });
         
 
@@ -153,3 +267,4 @@ document.querySelector('.search-form').addEventListener('submit', function(e) {
 
 
 fetchAnimeData();
+displayList();

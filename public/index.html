@@ -1,16 +1,14 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Anime Tracker</title>
 </head>
 <body>
-  <div class="container">
-
+<div class="container">
     <aside class="sidebar">
-      <div id="buttonicon">>></div>
+        <div id="buttonicon">>></div>
         <ul>
             <li><a href="#page">Lorem.</a></li>
             <li><a href="#page">Lorem.</a></li>
@@ -37,16 +35,17 @@
                 </div>
             </div>
 
-            <div class="personallist">
-                <ul>
-                    <li><div>User 1</div></li>
+            <div class="personallist_container">
+                <ul id="personallist">
+                    <!-- User's personal list dynamically rendered here -->
                 </ul>
             </div>
         </div>
     </div>
 </div>
-    <button id="next">next</button>
-    <button id="before">back</button>
+
+<button id="next">Next</button>
+<button id="before">Back</button>
 <script src="/clientscripts/main.js"></script>
 </body>
 </html>
