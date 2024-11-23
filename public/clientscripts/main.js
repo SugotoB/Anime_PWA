@@ -88,35 +88,24 @@ async function displayList() {
             deleteButton.textContent = 'Delete';
             deleteButton.classList.add('delete-button');
 
-            deleteButton.addEventListener('click', async () => {
-                if (confirm(`Do you want to delete'${anime.title}'from your list?`)) {
-                    try {
-                        const response = await fetch('/api/deleteanime', {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ id: anime.id }),
-                        });
-
-                        if (response.ok) {
-                            container.removeChild(listItem); 
-                            console.log('Anime deleted successfully');
-                        } else {
-                            console.error('Failed to delete anime');
-                        }
-                    } catch (error) {
-                        console.error('Error deleting anime:', error);
-                    }
-                }
-            });
-            
 
             //update progress
             
+            currentInput.addEventListener('input', (event) => {
+                const input = event.target;
+                input.value = input.value.replace(/[^0-9]/g, `${anime.user_progress}`); // Remove anything that's not a digit (0-9)
+            });
+            
             currentInput.addEventListener('change', async (update) => {
-                const newProgress = update.target.value; 
-                const animeId = anime.id; 
+                const newProgress = parseInt(update.target.value, 10);
+                const animeId = anime.id;
+                const epceiling = anime.anime_episodes;
+            
+                if (isNaN(newProgress) || newProgress < 0 || newProgress > epceiling) {
+                    alert(`Please enter a number between 0 and ${epceiling}.`)
+                    currentInput.value = `${anime.user_progress}`;
+                    return;
+                }
             
                 try {
                     const response = await fetch('/api/updateprog', {
@@ -124,7 +113,7 @@ async function displayList() {
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ id: animeId, user_progress: parseInt(newProgress, 10) }),
+                        body: JSON.stringify({ id: animeId, user_progress: newProgress }),
                     });
             
                     if (response.ok) {
@@ -136,7 +125,12 @@ async function displayList() {
                 } catch (error) {
                     console.error('Error updating progress:', error);
                 }
+
+                displayList()
             });
+            
+
+            
             
 
             animeDiv.appendChild(deleteButton);

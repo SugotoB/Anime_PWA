@@ -180,7 +180,7 @@ body {
     background-color: #555;
 }
 
-.personallist_container {
+.personallist > li > div {
     background-color: rgb(173, 150, 150);
     border-radius: 5px;
     padding: 1rem;
@@ -193,7 +193,14 @@ body {
     padding: 0;
 }
 
-#personallist > li > div { 
+#personallist > li {
+    margin-top: 10px;
+}
+
+
+
+
+.anime-item-container { 
     height: 100px;
     width: 100%;
     background-color: red;
