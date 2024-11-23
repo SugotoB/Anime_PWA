@@ -88,6 +88,31 @@ async function displayList() {
             deleteButton.textContent = 'Delete';
             deleteButton.classList.add('delete-button');
 
+            deleteButton.addEventListener('click', async () => {
+                const confirmation = confirm(`Do you want to delete "${anime.title}" from your list?`);
+                if (!confirmation) return;
+            
+                try {
+                    const response = await fetch('/api/deleteanime', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: anime.id }),
+                    });
+            
+                    if (response.ok) {
+                        container.removeChild(listItem);
+                        console.log('Anime deleted successfully!');
+                    } else {
+                        const errorData = await response.json();
+                        console.error('Failed to delete anime:', errorData.error);
+                    }
+                } catch (error) {
+                    console.error('Error deleting anime:', error);
+                }
+            });
+            
 
             //update progress
             
