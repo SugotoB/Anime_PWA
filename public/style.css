@@ -155,6 +155,22 @@ body {
     text-align: center;
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.anime-card {
+    opacity: 0; /* Start hidden */
+    animation: fadeIn 0.5s ease-out forwards; /* Fade-in animation */
+}
+
 .anime-image {
     width: 100%;
     height: auto;

@@ -3,27 +3,29 @@ const sidebar = document.getElementsByClassName('sidebar')[0];
 
 menubutton.addEventListener('click', function() {
     sidebar.classList.toggle('active');
-});
+}); // Sidebar functionality, adds an active class upon click event fulfillment, class has a transition
 
 
-
+//global variables (mutable)
 let currentPage = 1;
 let UserQuery = '';
 
-async function fetchAnimeData(query = '', rating = 'PG') {
+async function fetchAnimeData(query = '', rating = '') {
     UserQuery = query || UserQuery;
+    beforebutton.disabled = true; //disables button before api fetch
+    nextbutton.disabled = true; //disables button before api fetch
     const url = query
-        ? `https://api.jikan.moe/v4/anime?q=${query}&page=${currentPage}&rating=${rating}` 
-        : `https://api.jikan.moe/v4/anime?page=${currentPage}&rating=${rating}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    displayAnime(data.data);
-    beforebutton.disabled = currentPage<=1;
-    nextbutton.disabled = data.pagination.has_next_page === false;
+        ? `https://api.jikan.moe/v4/anime?q=${query}&page=${currentPage}&sfw&rating=${rating}` //online data call url if there is a query (uses ? ternary operator)
+        : `https://api.jikan.moe/v4/anime?page=${currentPage}&sfw&rating=${rating}`; //online data call url if there is no query
+    const response = await fetch(url); //waits for the fetch request to come back
+    const data = await response.json(); //waits for response to be formatted into json
+    displayAnime(data.data); // function is below
+    beforebutton.disabled = currentPage<=1; //re-enables button depending on conditions
+    nextbutton.disabled = data.pagination.has_next_page === false; //re-enables button depending on conditions
 };
 
 
-
+//next and before buttons, increments page number and reloads the anime, taking into account any user queries
 const nextbutton = document.getElementById('next');
 const beforebutton = document.getElementById('before');
 
@@ -41,14 +43,14 @@ beforebutton.addEventListener('click', function() {
 
 
 
-
+//function for displaying the anime
 
 async function displayList() {
     try {
-        const response = await fetch('/api/userlist');
-        const userlist = await response.json();
+        const response = await fetch('/api/userlist'); // waits for api fetch
+        const userlist = await response.json(); //waits for conversion of data into json format
 
-        const container = document.getElementById('personallist');
+        const container = document.getElementById('personallist'); 
         container.innerHTML = ''; // Clear the current list
 
         userlist.forEach((anime) => {
@@ -72,13 +74,13 @@ async function displayList() {
             const currentInput = document.createElement('input');
             currentInput.type = 'number';
             currentInput.min = 0;
-            currentInput.max = anime.anime_episodes || 0;
-            currentInput.value = anime.user_progress || 0; 
+            currentInput.max = anime.anime_episodes || 0; //sets to 0 if the former value is falsey
+            currentInput.value = anime.user_progress || 0; //sets to 0 if former value is falsey
             currentInput.classList.add('progress-input');
             progressSection.appendChild(currentInput);
 
             const totalEpisodes = document.createElement('span');
-            totalEpisodes.textContent = ` / ${anime.anime_episodes || 'N/A'}`;
+            totalEpisodes.textContent = ` / ${anime.anime_episodes || 'N/A'}`; //shows anime episodes from database, return N/A if falsey
             progressSection.appendChild(totalEpisodes);
 
             animeDiv.appendChild(progressSection);
@@ -176,6 +178,7 @@ async function displayList() {
 function displayAnime(animes) {
     const listContainer = document.getElementById('animelist');
     listContainer.innerHTML = ''; 
+
     
     animes.forEach(anime => {
         const animeItem = document.createElement('li');
@@ -184,6 +187,11 @@ function displayAnime(animes) {
         const animeCard = document.createElement('div');
         animeCard.classList.add('anime-card');
         
+        setTimeout(() => {
+            animeCard.classList.add('animate'), 100;
+        })
+
+
         const animeImage = document.createElement('img');
 
         animeImage.src = anime.images.jpg.image_url;
