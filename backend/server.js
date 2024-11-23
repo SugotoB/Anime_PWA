@@ -26,17 +26,34 @@ const db = new sqlite3.Database(path.join(__dirname, 'database', 'ListUser.db'),
 
  
 app.post('/api/addinganime', (request, response) => {
-    const { title, description, anime_episodes } = request.body;
+    const { title, description, anime_episodes, anime_id } = request.body;
 
-    const query = 'INSERT INTO listing (title, description, anime_episodes) VALUES (?, ?, ?)';
-    db.run(query, [title, description, anime_episodes], function (err) {
+    // Check if the anime already exists in the database
+    const checkQuery = 'SELECT COUNT(*) AS count FROM listing WHERE anime_id = ?';
+    db.get(checkQuery, [anime_id], (err, row) => {
         if (err) {
-            console.error(err.message);
-            return response.status(500).json({ error: 'Anime add failed' });
+            console.error('Error checking anime existence:', err.message);
+            return response.status(500).json({ error: 'Database error' });
         }
-        response.status(200).json({ message: 'Anime added successfully', id: this.lastID});
+
+        if (row.count > 0) {
+            // Anime already exists
+            return response.status(400).json({ error: 'Anime already exists in the database' });
+        }
+
+        // If anime doesn't exist, insert it
+        const insertQuery = 'INSERT INTO listing (title, description, anime_episodes, anime_id) VALUES (?, ?, ?, ?)';
+        db.run(insertQuery, [title, description, anime_episodes, anime_id], function (err) {
+            if (err) {
+                console.error('Error adding anime:', err.message);
+                return response.status(500).json({ error: 'Failed to add anime' });
+            }
+
+            response.status(200).json({ message: 'Anime added successfully', id: this.lastID });
+        });
     });
 });
+
 
 
 app.get('/api/userlist', (request, response) => {
@@ -69,7 +86,7 @@ app.put('/api/updateprog', (request, response) => {
     if (!id || user_progress == null) {
         return res.status(400).json({ error: 'Invalid request. Missing id or progress.' });
     }
-
+ 
     const query = `UPDATE listing SET user_progress = ? WHERE id = ?`;
     db.run(query, [user_progress, id], function (err) {
         if (err) {

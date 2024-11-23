@@ -179,6 +179,7 @@ function displayAnime(animes) {
     const listContainer = document.getElementById('animelist');
     listContainer.innerHTML = ''; 
 
+
     
     animes.forEach(anime => {
         const animeItem = document.createElement('li');
@@ -223,22 +224,31 @@ function displayAnime(animes) {
                     title: anime.title,
                     description: anime.synopsis,
                     anime_episodes: anime.episodes,
+                    anime_id: anime.mal_id, // mal_id is Jikan's unique identifier
                 }),
             })
-            .then(response => response.json())
-            .then(data => {
-                alert('Added!');
-                console.log('Added:', data);
-            })
-            .catch(error => {
-                console.error('Error adding anime:', error);
-            })
-            .finally(() => {
-                addbutton.disabled = false;
-
-            });
-             displayList();
+                .then(async response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.error || 'Failed to add anime');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('Anime added successfully!');
+                    console.log('Added:', data);
+                })
+                .catch(error => {
+                    alert(error.message);
+                    console.error('Error adding anime:', error);
+                })
+                .finally(() => {
+                    addbutton.disabled = false;
+                    displayList(); // Refresh the list after attempting to add
+                });
         });
+        
         
 
 
