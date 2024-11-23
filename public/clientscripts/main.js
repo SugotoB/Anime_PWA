@@ -1,14 +1,20 @@
-const menubutton = document.getElementById('buttonicon');
-const sidebar = document.getElementsByClassName('sidebar')[0];
-
-menubutton.addEventListener('click', function() {
-    sidebar.classList.toggle('active');
-}); // Sidebar functionality, adds an active class upon click event fulfillment, class has a transition
 
 
 //global variables (mutable)
 let currentPage = 1;
 let UserQuery = '';
+
+
+//check if user is online or offline
+if (navigator.onLine){
+    console.log('online')
+} 
+
+else {
+    console.log('offline')
+};
+
+
 
 async function fetchAnimeData(query = '', rating = '') {
     UserQuery = query || UserQuery;
@@ -17,12 +23,42 @@ async function fetchAnimeData(query = '', rating = '') {
     const url = query
         ? `https://api.jikan.moe/v4/anime?q=${query}&page=${currentPage}&sfw&rating=${rating}` //online data call url if there is a query (uses ? ternary operator)
         : `https://api.jikan.moe/v4/anime?page=${currentPage}&sfw&rating=${rating}`; //online data call url if there is no query
-    const response = await fetch(url); //waits for the fetch request to come back
-    const data = await response.json(); //waits for response to be formatted into json
-    displayAnime(data.data); // function is below
-    beforebutton.disabled = currentPage<=1; //re-enables button depending on conditions
-    nextbutton.disabled = data.pagination.has_next_page === false; //re-enables button depending on conditions
-};
+
+
+        try {
+            if (navigator.onLine) {
+                const response = await fetch(url);
+                const data = await response.json();
+                displayAnime(data.data);
+            } else {
+                // offline fetch
+                const offlineData = await offlineData();
+                displayAnime(offlineData);
+            }
+        } catch (error) {
+            console.error('Error fetching anime data:', error);
+        } finally {
+            beforebutton.disabled = currentPage <= 1;
+            nextbutton.disabled = data.pagination.has_next_page === false;
+        }
+    }
+
+
+async function offlineFetch(){
+
+    try{
+        const response  = await fetch('/api/offline');
+        const offlineData  = await response.json();
+
+        return offlineData;
+
+    } catch (error) {
+        console.error('problems fetching data offline: ', error.message);
+        return []; // returns empty array to prevent breaking down to other aspects
+    }
+}
+
+
 
 
 //next and before buttons, increments page number and reloads the anime, taking into account any user queries
@@ -305,3 +341,10 @@ document.querySelector('.search-form').addEventListener('submit', function(e) {
 
 fetchAnimeData();
 displayList();
+
+const menubutton = document.getElementById('buttonicon');
+const sidebar = document.getElementsByClassName('sidebar')[0];
+
+menubutton.addEventListener('click', function() {
+    sidebar.classList.toggle('active');
+}); // Sidebar functionality, adds an active class upon click event fulfillment, class has a transition

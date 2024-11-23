@@ -28,12 +28,12 @@ const db = new sqlite3.Database(path.join(__dirname, 'database', 'ListUser.db'),
 app.post('/api/addinganime', (request, response) => {
     const { title, description, anime_episodes, anime_id } = request.body;
 
-    // Check if the anime already exists in the database
+    //check if exists
     const checkQuery = 'SELECT COUNT(*) AS count FROM listing WHERE anime_id = ?';
     db.get(checkQuery, [anime_id], (err, row) => {
         if (err) {
-            console.error('Error checking anime existence:', err.message);
-            return response.status(500).json({ error: 'Database error' });
+            console.error('error in checking existence: ', err.message);
+            return response.status(500).json({ error: 'db error' });
         }
 
         if (row.count > 0) {
@@ -104,17 +104,18 @@ app.put('/api/updateprog', (request, response) => {
 
 
 
-// app.get('/api/offlinelist', (request, response) => {
-//     db.all('SELECT * FROM offlinelist', [], (err, rows) => {
-//     if(err) { 
-//         console.error(err.message)
-//         return response.status(500).json({error: "Failed retrieving user's listed data.", detail: err.message})
-//     }
+app.get('/api/offline', (request, response) => {
+    db.all('SELECT * FROM offline', [], (err, rows) => {
+    if(err) { 
+        console.error(err.message)
+        return response.status(500).json({error: "Failed retrieving user's listed data.", detail: err.message})
+    }
 
-//     response.status(200).json(rows)
-// })
+    console.log('offline session log successful')
+    response.status(200).json(rows) //returns data
+})
 
-// });
+});
 
 
 
