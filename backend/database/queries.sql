@@ -3,7 +3,7 @@
 --     anime_id INTEGER NOT NULL,
 --     title TEXT NOT NULL,
 --     description TEXT,
---     anime_episodes INTEGER NOT NULL,
+--     anime_episodes INTEGER,
 --     user_progress INTEGER NOT NULL DEFAULT 0,
 --     UNIQUE(anime_id) 
 -- );
@@ -27,3 +27,6 @@
 --     image_path TEXT NOT NULL);
 
 -- drop table offline;
+
+UPDATE offline
+SET image_path = NULL;

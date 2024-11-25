@@ -104,26 +104,15 @@ app.put('/api/updateprog', (request, response) => {
 
 
 
-app.get('/api/offline', (request, response) => {
+app.get('/api/offline', (req, res) => {
     db.all('SELECT * FROM offline', [], (err, rows) => {
-    if(err) { 
-        console.error(err.message)
-        return response.status(500).json({error: "Failed retrieving user's listed data.", detail: err.message})
-    }
-
-    console.log('offline session log successful')
-    response.status(200).json(rows) //returns data
-})
-
+        if (err) {
+            console.error('Error fetching offline data:', err.message);
+            return res.status(500).json({ error: 'Failed to retrieve offline data' });
+        }
+        res.status(200).json(rows);
+    });
 });
-
-
-
-
-
-
-
-
 
 
 
