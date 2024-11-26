@@ -19,19 +19,25 @@ if ('serviceWorker' in navigator) {
 
 
 
-//global variables (mutable)
+
+//global variables
 let currentPage = 1;
 let UserQuery = '';
 
 
-//check if user is online or offline
-function isOnline() { 
-    return navigator.onLine;
-}
 
 
+window.addEventListener('online', function(){
+    console.log('you are online!')
+    this.window.location.reload();
+});
 
-// Event listener for online/offline status change
+
+window.addEventListener('offline', function(){
+        console.log('you are offline!')
+        this.window.location.reload();
+    });
+
 
 
 // Function to fetch anime data
@@ -74,17 +80,6 @@ async function fetchAnimeData(query = '', rating = '') {
     }
 }
 
-
-// async function offlineFetch() {
-//     try {
-//         const response = await fetch('/api/offline'); // Offline endpoint
-//         const offlineData = await response.json();
-//         return offlineData; // Return offline data
-//     } catch (error) {
-//         console.error('Problems fetching offline data:', error.message);
-//         return []; // Return an empty array to prevent issues
-//     }
-// }
 
 async function offlineFetch(query = '') {
     try {
