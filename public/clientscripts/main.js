@@ -4,6 +4,8 @@
 //     }).catch((error) => {
 //         console.error('Service Worker Registration Failed:', error);
 //     });
+
+
 // }
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/clientscripts/serviceworker.js')
@@ -16,62 +18,98 @@ if ('serviceWorker' in navigator) {
 }
 
 
+
 //global variables (mutable)
 let currentPage = 1;
 let UserQuery = '';
 
 
 //check if user is online or offline
-function isOnline() {
+function isOnline() { 
     return navigator.onLine;
 }
 
+
+
 // Event listener for online/offline status change
-window.addEventListener('online', () => console.log('Back online!'));
-window.addEventListener('offline', () => console.log('You are offline!'));
+
 
 // Function to fetch anime data
 async function fetchAnimeData(query = '', rating = '') {
     UserQuery = query || UserQuery;
-    beforebutton.disabled = true; // Disable buttons before API fetch
+    beforebutton.disabled = true; // Disable navigation buttons
     nextbutton.disabled = true;
 
     const url = query
         ? `https://api.jikan.moe/v4/anime?q=${query}&page=${currentPage}&sfw&rating=${rating}`
         : `https://api.jikan.moe/v4/anime?page=${currentPage}&sfw&rating=${rating}`;
 
-    let data; // Declare data here
-
     try {
-        if (isOnline()) {
-            const offlineData = await offlineFetch();
-            displayAnime(offlineData); // Call display function with online data
-            console.log('online fetching on')
+        if (navigator.onLine) {
+            // If online, fetch from the network
+            console.log('User is online, fetching data from API...');
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Network response was not ok: ${response.status}`);
+            const data = await response.json();
+            displayAnime(data.data); // Display fetched data
+            console.log('Online fetching successful');
         } else {
-            const offlineData = await offlineFetch(); // Fetch offline data
-            displayAnime(offlineData); // Call display function with offline data
-            console.log('offline fetching on')
+            // If offline, fetch from the cache or offline API
+            console.log('User is offline, attempting offline data fetch...');
+            const offlineData = await offlineFetch(query); 
+            displayAnime(offlineData); // Display offline data
         }
     } catch (error) {
-        console.error('Error fetching anime data:', error);
+        console.error('Fetch failed:', error);
+        if (!navigator.onLine) {
+            const offlineData = await offlineFetch(); 
+            displayAnime(offlineData); // Display offline data
+        } else {
+            console.error('Error during data fetching:', error);
+        }
     } finally {
-        // Handle button states after fetch
+        // Update navigation buttons
         beforebutton.disabled = currentPage <= 1;
-        nextbutton.disabled = !data || !data.pagination || !data.pagination.has_next_page;
+        nextbutton.disabled = false; // Enable unless explicitly disabled
     }
 }
 
 
-async function offlineFetch() {
+// async function offlineFetch() {
+//     try {
+//         const response = await fetch('/api/offline'); // Offline endpoint
+//         const offlineData = await response.json();
+//         return offlineData; // Return offline data
+//     } catch (error) {
+//         console.error('Problems fetching offline data:', error.message);
+//         return []; // Return an empty array to prevent issues
+//     }
+// }
+
+async function offlineFetch(query = '') {
     try {
-        const response = await fetch('/api/offline'); // Offline endpoint
+
+        let url = '/api/offline'; 
+        const params = [];
+
+        if (query) {
+            params.push(`q=${encodeURIComponent(query)}`);
+        }
+
+        if (params.length > 0) {
+            url += `?${params.join('&')}`;
+        }
+
+        const response = await fetch(url);
         const offlineData = await response.json();
-        return offlineData; // Return offline data
+        
+        return offlineData; 
     } catch (error) {
         console.error('Problems fetching offline data:', error.message);
-        return []; // Return an empty array to prevent issues
+        return []; 
     }
 }
+
 
 
 
@@ -273,9 +311,9 @@ function displayAnime(animes) {
                 },
                 body: JSON.stringify({
                     title: anime.title,
-                    description: anime.description,
-                    anime_episodes: anime.anime_episodes,
-                    anime_id: anime.anime_id, // mal_id is Jikan's unique identifier
+                    description: anime.synopsis,
+                    anime_episodes: anime.episodes,
+                    anime_id: anime.mal_id, // mal_id is Jikan's unique identifier
                 }),
             })
                 .then(async response => {
@@ -332,7 +370,7 @@ function openDescriptionPopup(description) {
     });
     
     const popupText = document.createElement('p');
-    popupText.textContent = description || 'No results found.';
+    popupText.textContent = description || 'No description available.';
     
     popupContent.appendChild(closeButton);
     popupContent.appendChild(popupText);
@@ -348,7 +386,7 @@ function openDescriptionPopup(description) {
 
 document.querySelector('.search-form').addEventListener('submit', function(e) {
     e.preventDefault();
-    const query = document.querySelector('.search-form input').value;
+    const query = document.querySelector('.search-form input').value; //established the query value taken from .search-form class
     fetchAnimeData(query); 
     currentPage = 1;
 });

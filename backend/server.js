@@ -4,6 +4,7 @@ const path = require('path');
 const cors = require('cors');
 const parser = require('body-parser');
 const { error } = require('console');
+const { request } = require('http');
 
 const app = express();
 
@@ -104,17 +105,24 @@ app.put('/api/updateprog', (request, response) => {
 
 
 
-app.get('/api/offline', (req, res) => {
-    db.all('SELECT * FROM offline', [], (err, rows) => {
+app.get('/api/offline', (request, response) => {
+    const { q } = request.query;  
+    let sql = 'SELECT * FROM offline';
+    if (q) {
+        sql += ` WHERE title LIKE ?`;
+    }
+    const params = [];
+    if (q) {
+        params.push(`%${q}%`); 
+    }
+    db.all(sql, params, (err, rows) => {
         if (err) {
-            console.error('Error fetching offline data:', err.message);
-            return res.status(500).json({ error: 'Failed to retrieve offline data' });
+            console.error('Error fetching data:', err);
+            return response.status(500).json({ error: 'Database query failed' });
         }
-        res.status(200).json(rows);
+        response.json(rows); 
     });
 });
-
-
 
 const port = 3000;
 app.listen(port, () => {
