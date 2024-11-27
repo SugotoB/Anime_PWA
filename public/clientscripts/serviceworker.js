@@ -41,8 +41,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const request = event.request;
 
-    // Serve local database or images directly
     if (request.url.endsWith('.db') || request.url.includes('/images/')) {
+        // Serve DB and image files directly from the cache
         event.respondWith(
             caches.match(request).then((cachedResponse) => {
                 return cachedResponse || fetch(request).then(async (response) => {
@@ -54,6 +54,7 @@ self.addEventListener('fetch', (event) => {
         );
         return;
     }
+    
 
     // Serve other static assets from the cache
     event.respondWith(

@@ -77,4 +77,78 @@
 --  138, 
 --  'images/my_hero_academia.jpg');
 
+INSERT INTO offline (title, synopsis, episodes, image_path)
+VALUES 
+('a', 
+ 'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
+ 138, 
+ 'images/animeicon.png'),
+
+ ('b', 
+ 'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
+ 138, 
+ 'images/animeicon.png'),
+
+ ('c', 
+ 'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
+ 138, 
+ 'images/animeicon.png'),
+
+ ('d', 
+ 'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
+ 138, 
+ 'images/animeicon.png'),
+
+ ('e', 
+ 'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
+ 138, 
+ 'images/animeicon.png'),
+
+
+ ('f', 
+ 'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
+ 138, 
+ 'images/animeicon.png'),
+
+ ('g', 
+ 'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
+ 138, 
+ 'images/animeicon.png'),
+
+
+ ('h', 
+ 'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
+ 138, 
+ 'images/animeicon.png'),
+
+
+ ('i', 
+ 'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
+ 138, 
+ 'images/animeicon.png'),
+
+
+
+ ('j', 
+ 'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
+ 138, 
+ 'images/animeicon.png'),
+
+
+ ('k', 
+ 'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
+ 138, 
+ 'images/animeicon.png'),
+
+ ('l', 
+ 'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
+ 138, 
+ 'images/animeicon.png'),
+
+ ('m', 
+ 'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
+ 138, 
+ 'images/animeicon.png')
+ ;
+
  
