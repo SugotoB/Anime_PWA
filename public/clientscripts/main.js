@@ -393,9 +393,3 @@ document.querySelector('.search-form').addEventListener('submit', function(e) {
 fetchAnimeData();
 displayList();
 
-const menubutton = document.getElementById('buttonicon');
-const sidebar = document.getElementsByClassName('sidebar')[0];
-
-menubutton.addEventListener('click', function() {
-    sidebar.classList.toggle('active');
-}); // Sidebar functionality, adds an active class upon click event fulfillment, class has a transition
