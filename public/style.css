@@ -208,7 +208,8 @@ body {
 #personallist {
     list-style-type: none;
     padding: 0;
-}
+    max-height: 750px;
+    overflow-y: auto;}
 
 #personallist > li {
     margin-top: 10px;
@@ -275,6 +276,10 @@ body {
 
     .anime-card {
         width: 100%;
+    }
+
+    #personallist{
+        max-height: 200px;
     }
 }
 

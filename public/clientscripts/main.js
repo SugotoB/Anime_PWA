@@ -56,7 +56,8 @@ async function fetchAnimeData(query = '', rating = '') {
             const response = await fetch(url);
             if (!response.ok) throw new Error(`network response error: ${response.status}`);
             const data = await response.json();
-            displayAnime(data.data); // Display fetched data
+            const filteredData = data.data.filter(anime => anime.episodes !== null);
+            displayAnime(filteredData); // Display fetched data
             console.log('Online fetching successful');
         } else {
             console.log('User offline, cache fetching in progress...');
@@ -274,10 +275,13 @@ function displayAnime(animes) {
         })
 
         const animeImage = document.createElement('img');
+        const animeEps = document.createElement('p');
         const pathofimage = navigator.onLine ? anime.images.jpg.image_url : anime.image_path; //sets to different paths depending on if the user is offline or online.
         
-        animeImage.src = pathofimage;
+        animeEps.textContent = `episodes: ${anime.episodes}`
 
+
+        animeImage.src = pathofimage;
         animeImage.alt = anime.title;
         animeImage.classList.add('anime-image');
         animeCard.appendChild(animeImage);
@@ -338,6 +342,7 @@ function displayAnime(animes) {
             openDescriptionPopup(anime.synopsis);
         });
 
+        animeCard.appendChild(animeEps);
         animeCard.appendChild(addbutton);
         animeCard.appendChild(descriptionButton);
         animeItem.appendChild(animeCard);
