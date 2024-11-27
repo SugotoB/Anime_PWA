@@ -233,12 +233,19 @@ body {
 }
 
 .addbutton{
-    height: 20px;
-    background-color: red;
-    width: 20px;
+    height: 30px;
+    background-color: rgb(66, 58, 58);
+    border-radius: 5px;
+    border-style: none;
+    width: 50px;
+    color: white;
 }
 
-@media (max-width: 768px) {
+.addbutton:hover{
+    background-color: rgb(97, 97, 97);
+}
+
+@media (max-width: 768px), (max-height: 500px) {
     .content {
         grid-template-columns: 1fr;
     }

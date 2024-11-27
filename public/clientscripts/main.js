@@ -296,6 +296,8 @@ function displayAnime(animes) {
 
 
         const addbutton = document.createElement('button');
+
+        addbutton.innerText = "Add";
         addbutton.classList.add('addbutton');
 
         addbutton.addEventListener('click', () => {
