@@ -1,14 +1,5 @@
-// if ('serviceWorker' in navigator) {
-//     navigator.serviceWorker.register('/sw.js').then(() => {
-//         console.log('Service Worker Registered');
-//     }).catch((error) => {
-//         console.error('Service Worker Registration Failed:', error);
-//     });
-
-
-// }
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/clientscripts/serviceworker.js')
+    navigator.serviceWorker.register('/serviceworker.js')
         .then(() => {
             console.log('Service Worker Registered');
         })
@@ -24,19 +15,6 @@ if ('serviceWorker' in navigator) {
 let currentPage = 1;
 let UserQuery = '';
 
-
-
-
-window.addEventListener('online', function(){
-    console.log('you are online!')
-    this.window.location.reload();
-});
-
-
-window.addEventListener('offline', function(){
-        console.log('you are offline!')
-        this.window.location.reload();
-    });
 
 
 
@@ -394,4 +372,3 @@ document.querySelector('.search-form').addEventListener('submit', function(e) {
 
 fetchAnimeData();
 displayList();
-

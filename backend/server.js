@@ -30,16 +30,14 @@ app.post('/api/addinganime', (request, response) => {
     const { title, description, anime_episodes, anime_id } = request.body;
 
     //check if exists
-    const checkQuery = 'SELECT COUNT(*) AS count FROM listing WHERE anime_id = ?';
-    db.get(checkQuery, [anime_id], (err, row) => {
+    const dupechecker = 'SELECT COUNT(*) AS count FROM listing WHERE title = ?';
+    db.get(dupechecker, [title], (err, row) => {
         if (err) {
             console.error('error in checking existence: ', err.message);
             return response.status(500).json({ error: 'db error' });
         }
-
         if (row.count > 0) {
-            // Anime already exists
-            return response.status(400).json({ error: 'Anime already exists in the database' });
+            return response.status(400).json({error: 'already in db'});
         }
 
         // If anime doesn't exist, insert it
@@ -105,26 +103,27 @@ app.put('/api/updateprog', (request, response) => {
 
 
 
-app.get('/api/offline', (request, response) => {
-    const { q } = request.query;  
+app.get('/api/offline', (req, res) => {
+    const { q } = req.query;  
     let sql = 'SELECT * FROM offline';
+    const params = [];
+
     if (q) {
         sql += ` WHERE title LIKE ?`;
+        params.push(`%${q}%`);
     }
-    const params = [];
-    if (q) {
-        params.push(`%${q}%`); 
-    }
+
     db.all(sql, params, (err, rows) => {
         if (err) {
             console.error('Error fetching data:', err);
-            return response.status(500).json({ error: 'Database query failed' });
+            return res.status(500).json({ error: 'Database query failed' });
         }
-        response.json(rows); 
+        res.json(rows); 
     });
 });
+
 
 const port = 3000;
 app.listen(port, () => {
     console.log(`running http://localhost:${port}`);
-});
+}); 

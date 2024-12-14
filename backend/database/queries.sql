@@ -1,12 +1,11 @@
--- CREATE TABLE listing (
---     id INTEGER PRIMARY KEY AUTOINCREMENT,
---     anime_id INTEGER NOT NULL,
---     title TEXT NOT NULL,
---     description TEXT,
---     anime_episodes INTEGER,
---     user_progress INTEGER NOT NULL DEFAULT 0,
---     UNIQUE(anime_id) 
--- );
+CREATE TABLE listing (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    anime_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    anime_episodes INTEGER,
+    user_progress INTEGER NOT NULL DEFAULT 0
+);
 
 
 
@@ -19,17 +18,17 @@
 -- select * from Userlisting;
 -- DELETE FROM listing;
 
--- CREATE TABLE offline (
---     mal_id INTEGER PRIMARY KEY AUTOINCREMENT,  
---     title TEXT NOT NULL,              
---     synopsis TEXT,                
---     episodes INTEGER NOT NULL,   
---     image_path TEXT NOT NULL);
+CREATE TABLE offline (
+    mal_id INTEGER PRIMARY KEY AUTOINCREMENT,  
+    title TEXT NOT NULL,              
+    synopsis TEXT,                
+    episodes INTEGER NOT NULL,   
+    image_path TEXT NOT NULL);
 
 
 
 
--- drop table offline;
+drop table offline;
 
 -- UPDATE offline
 -- SET image_path = '';
