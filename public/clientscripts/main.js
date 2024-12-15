@@ -7,6 +7,7 @@ if ('serviceWorker' in navigator) {
 
 
 
+
 //global variables
 let currentPage = 1;
 let UserQuery = '';

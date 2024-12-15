@@ -1,31 +1,23 @@
+/* Global Reset */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-
-
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     height: 100vh;
-    background-color: rgb(13, 255, 65);
+    background-color: #f9f3e6; /* Light tan background */
+    color: #333;
 }
 
+/* Layout Containers */
 .container {
     display: flex;
     width: 100%;
     height: 100vh;
 }
-
-
-#buttonicon {
-    cursor: pointer;
-    position: fixed;
-    background-color: red;
-}
-
-
 
 .main-content {
     display: flex;
@@ -33,35 +25,68 @@ body {
     flex: 1;
 }
 
-.header {
-    padding: 1rem;
-    background-color: #dbd3d3;
-    color: #000;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    justify-content: center;
-}
-
-
-
-.logo img{
-    height: 3em;
-    width:3em;
-}
-
 .content {
     display: grid;
-    grid-template-rows: 1fr;
     grid-template-columns: 3fr 1fr;
     gap: 1rem;
     padding: 1rem;
     flex: 1;
-    background-color: blue;
+    background-color: #ffe0b2; /* Light pastel orange */
 }
 
+.header {
+    padding: 1rem;
+    background-color: #f2e6d9; /* Light pastel tan */
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.logo img {
+    height: 3em;
+    width: 3em;
+}
+
+/* Buttons */
+#buttonicon {
+    cursor: pointer;
+    position: fixed;
+    background-color: #f44336; /* Soft red */
+}
+
+#next, #before {
+    height: 50px;
+    width: 100px;
+    border-radius: 10px;
+    text-align: center;
+    line-height: 50px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+#next {
+    background-color: #ffb74d; /* Pastel orange */
+}
+
+#before {
+    background-color: #ff7043; /* Slight orange-red */
+}
+
+#next:hover {
+    background-color: #ff9800; /* Darker pastel orange on hover */
+}
+
+#before:hover {
+    background-color: #e64a19; /* Darker orange-red on hover */
+}
+
+/* Library Section */
 .librarycontainer {
-    background-color: lightgray;
+    background-color: #fff4e6; /* Pastel tan */
     border-radius: 5px;
     overflow-y: auto;
     display: flex;
@@ -69,6 +94,7 @@ body {
     padding: 1rem;
 }
 
+/* Search Form */
 .search-form {
     display: flex;
     background-color: white;
@@ -86,19 +112,21 @@ body {
 
 .search-form button {
     padding: 0.5rem 1rem;
-    background-color: #333;
+    background-color: #ffb74d; /* Pastel orange */
     color: white;
     border: none;
     cursor: pointer;
     border-radius: 0 5px 5px 0;
+    transition: background-color 0.3s ease;
 }
 
 .search-form button:hover {
-    background-color: #555;
+    background-color: #ff9800; /* Darker pastel orange */
 }
 
+/* Anime List */
 .animelistcontainer {
-    background-color: blue;
+    background-color: #ffe0b2; /* Light pastel orange */
     border-radius: 10px;
     width: 100%;
     min-height: 500px;
@@ -115,7 +143,6 @@ body {
 
 .animelistcontainer > #animelist > li {
     list-style: none;
-    flex: 1;
     display: flex;
     justify-content: center;
 }
@@ -123,13 +150,47 @@ body {
 .anime-card {
     background-color: #fff;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 15px;
     width: 200px;
-    margin: 20px;
     text-align: center;
+    animation: fadeIn 0.5s ease-out forwards;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.anime-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.anime-card h3 {
+    font-size: 1.2rem;
+    margin-top: 10px;
+}
+
+.anime-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Buttons within Cards */
+.description-button {
+    margin-top: 10px;
+    padding: 0.5rem;
+    background-color: #ffb74d; /* Pastel orange */
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.description-button:hover {
+    background-color: #ff9800; /* Darker pastel orange */
+}
+
+/* Keyframe Animation */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -141,38 +202,7 @@ body {
     }
 }
 
-.anime-card {
-    opacity: 0; /* Start hidden */
-    animation: fadeIn 0.5s ease-out forwards; /* Fade-in animation */
-}
-
-.anime-image {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-}
-
-.anime-card h3 {
-    font-size: 1.2rem;
-    margin-top: 10px;
-}
-
-.description-button {
-    margin-top: 10px;
-    padding: 0.5rem;
-    background-color: #333;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.description-button:hover {
-    background-color: #555;
-}
-
-
-
+/* Personal List */
 #personallist {
     list-style-type: none;
     padding: 0;
@@ -184,145 +214,127 @@ body {
     margin-top: 10px;
 }
 
-.buttoncontainer{
-    height: 100%;
+.buttoncontainer {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-
-
-.anime-item-container { 
-    height: 100px;
-    width: 100%;
-    background-color: rgb(176, 172, 172);
-    border-radius: 0.5rem;
+/* Progress Section */
+.progress-section {
+    background: #ffb74d; /* Pastel orange */
+    border-radius: 5px;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.progress-section{
-    background: red;
+.progress-input {
+    background: #ff7043; /* Slight orange-red */
+    border: none;
+    height: 40px;
+    width: 80px;
+    text-align: center;
+    color: white;
+    border-radius: 5px;
 }
 
-.progress-input{
-    background: blue;
-    border-style: none;
-    height: 50px;
-    border-radius: 10px;
-}
-
+/* Popup Styling */
 .popup {
     position: fixed;
     top: 0;
     left: 0;
-    padding: 10%;
     width: 100%;
     height: 100%;
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(0, 0, 0, 0.7);
     z-index: 1000;
+    padding: 10%;
 }
 
 .popup-content {
     background: white;
     padding: 20px;
-    scroll-behavior: auto;
-    height: 400px;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
+    height: 400px;
     max-width: 500px;
     width: 90%;
 }
 
-.synopsiscontainer{
+.synopsiscontainer {
     height: 70%;
-    width: 100%;
     overflow-y: auto;
 }
 
-
-
-
+.popup-heading {
+    text-align: center;
+}
 
 .popup-close {
-    background-color: #333;
+    background-color: #ff7043; /* Slight orange-red */
     color: white;
     padding: 0.5rem;
     margin: 0.5rem;
     border: none;
     cursor: pointer;
     border-radius: 5px;
-}
-
-.popup_heading{
-    text-align: center;
+    transition: background-color 0.3s ease;
 }
 
 .popup-close:hover {
-    background-color: #555;
+    background-color: #e64a19; /* Darker orange-red */
 }
 
-.addbutton{
+/* Add Button */
+.addbutton {
     height: 30px;
-    background-color: rgb(66, 58, 58);
+    background-color: #ffb74d; /* Pastel orange */
     border-radius: 5px;
-    border-style: none;
+    border: none;
     width: 50px;
     margin-right: 0.2rem;
     color: white;
+    transition: background-color 0.3s ease;
 }
 
-.addbutton:hover{
-    background-color: rgb(97, 97, 97);
+.addbutton:hover {
+    background-color: #ff9800; /* Darker pastel orange */
 }
 
+/* Responsive Design */
 @media (max-width: 768px), (max-height: 500px) {
     .content {
         grid-template-columns: 1fr;
     }
 
-    .animelistcontainer{
+    .animelistcontainer {
         max-height: 300px;
-    }
-
-    .search-form {
-        grid-column: 1 / 2;
     }
 
     .anime-card {
         width: 100%;
     }
 
-    .personallist_container{
-        max-height: 150px;
-    }
-
-    #personallist{
-        height: 150px;
-    }
-
-    .librarycontainer{
+    .librarycontainer {
         max-height: 500px;
     }
 
+    #before {
+        position: fixed;
+        bottom: 10px;
+        width: calc(50% - 10px);
+        left: 0; /* Align to the left */
+    }
+    
+    #next {
+        position: fixed;
+        bottom: 10px;
+        width: calc(50% - 10px);
+        right: 0; /* Align to the right */
+    }
 }
-
-
-#next{
-    height: 50px;
-    background-color: red;
-    width: 100px;
-    border-radius: 10px;
-}
-#before{
-    height: 50px;
-    background-color: blue;
-    width: 100px;
-    border-radius: 10px;
-}
-
-
-
