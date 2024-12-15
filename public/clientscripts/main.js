@@ -52,82 +52,29 @@ async function fetchAnimeData(query = '', rating = '') {
 }
 
 
-function registerSync() {
-    navigator.serviceWorker.ready
-        .then((registration) => {
-            return registration.sync.register('anime-sync-requests');
-        })
-        .then(() => console.log('Background sync registered!'))
-        .catch((err) => console.error('Background sync failed:', err));
-}
-
 async function offlineFetch(query = '') {
     try {
-        const db = await openDB(); // Open the IndexedDB
-        let data = [];
+
+        let url = '/api/offline'; 
+        const params = [];
 
         if (query) {
-            // Searching for specific data in the "offlineData" object store
-            const transaction = db.transaction('offlineData', 'readonly');
-            const store = transaction.objectStore('offlineData');
-            const allData = await new Promise((resolve, reject) => {
-                const request = store.getAll();  // This fetches all data
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = (event) => reject(event.target.error);
-            });
-
-            // Filter data based on the query
-            data = allData.filter(item => item.name && item.name.toLowerCase().includes(query.toLowerCase()));
-        } else {
-            // Fetch all data if no query is provided
-            const transaction = db.transaction('offlineData', 'readonly');
-            const store = transaction.objectStore('offlineData');
-            data = await new Promise((resolve, reject) => {
-                const request = store.getAll();  // This fetches all data
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = (event) => reject(event.target.error);
-            });
+            params.push(`q=${encodeURIComponent(query)}`);
         }
 
-        return data;  // Return filtered or unfiltered data
+        if (params.length > 0) {
+            url += `?${params.join('&')}`;
+        }
+
+        const response = await fetch(url);
+        const offlineData = await response.json();
+        
+        return offlineData; 
     } catch (error) {
-        console.error('Error fetching offline data from IndexedDB:', error.message);
-        return [];  // Return empty array in case of error
+        console.error('Problems fetching offline data:', error.message);
+        return []; 
     }
 }
-
-const openDB = () => {
-    const DB_NAME = 'animeTrackerDB';
-    const DB_VERSION = 6;
-
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-        request.onerror = (event) => {
-            console.error('Error opening IndexedDB:', event.target.error);
-            reject(event.target.error);
-        };
-
-        request.onsuccess = (event) => {
-            resolve(event.target.result); // This is the database instance
-        };
-
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-
-            // Create object stores if they don't exist
-            if (!db.objectStoreNames.contains('offlineData')) {
-                db.createObjectStore('offlineData', { keyPath: 'mal_id' });
-            }
-            if (!db.objectStoreNames.contains('userListData')) {
-                db.createObjectStore('userListData', { keyPath: 'id' });
-            }
-
-            console.log('IndexedDB upgraded to version', DB_VERSION);
-        };
-    });
-};
-
 
 
 //next and before buttons, increments page number and reloads the anime, taking into account any user queries
@@ -277,26 +224,6 @@ async function displayList() {
 }
 
 
-
-
-// Example of deleting an anime
-const deleteAnime = async (animeId) => {
-    try {
-        const db = await openDB();
-        const transaction = db.transaction('userListData', 'readwrite');
-        const store = transaction.objectStore('userListData');
-        store.delete(animeId);  // Delete anime by ID
-
-        console.log(`Anime with ID ${animeId} deleted.`);
-
-        // Sync with the server after deletion
-        const updatedData = await fetch(LIST_API_URL).then((response) => response.json());
-        await clearAndSyncDB('userListData', updatedData);
-
-    } catch (error) {
-        console.error('Failed to delete anime:', error);
-    }
-};
 
 
 function displayAnime(animes) {

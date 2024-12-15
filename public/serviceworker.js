@@ -1,4 +1,6 @@
-const CACHE_NAME = 'anime-tracker-cache-v3';
+const CACHE_NAME = 'anime-tracker-cache-v1';
+
+// Static assets to cache
 const STATIC_ASSETS = [
     '/',
     '/index.html',
@@ -12,188 +14,68 @@ const STATIC_ASSETS = [
 const OFFLINE_API_URL = '/api/offline';
 const LIST_API_URL = '/api/userlist';
 
-// IndexedDB Helpers
-const openDB = () => {
-    const DB_NAME = 'animeTrackerDB';
-    const DB_VERSION = 6;
-
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-        request.onerror = (event) => {
-            console.error('Error opening IndexedDB:', event.target.error);
-            reject(event.target.error);
-        };
-
-        request.onsuccess = (event) => {
-            resolve(event.target.result);
-        };
-
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-
-            // Create object stores if they don't exist
-            if (!db.objectStoreNames.contains('offlineData')) {
-                db.createObjectStore('offlineData', { keyPath: 'mal_id' });
-            }
-            if (!db.objectStoreNames.contains('userListData')) {
-                db.createObjectStore('userListData', { keyPath: 'id' });
-            }
-
-            console.log('IndexedDB upgraded to version', DB_VERSION);
-        };
-    });
-};
-
-const clearAndAddToDB = async (storeName, data) => {
-    try {
-        const db = await openDB();
-        const transaction = db.transaction(storeName, 'readwrite');
-        const store = transaction.objectStore(storeName);
-
-        // Clear existing data (wait for clear to finish)
-        await new Promise((resolve, reject) => {
-            const clearRequest = store.clear();
-            clearRequest.onsuccess = () => resolve();
-            clearRequest.onerror = (event) => reject(event.target.error);
-        });
-
-        console.log(`Cleared ${storeName} in IndexedDB.`);
-
-        // Add new data
-        if (Array.isArray(data)) {
-            data.forEach((item) => store.put(item));
-        } else {
-            store.put(data);
-        }
-
-        console.log(`Added new data to ${storeName} in IndexedDB.`);
-    } catch (error) {
-        console.error(`Failed to update ${storeName}:`, error);
-    }
-};
-
-const clearAndSyncDB = async (storeName, newData) => {
-    try {
-        const db = await openDB();
-        const transaction = db.transaction(storeName, 'readwrite');
-        const store = transaction.objectStore(storeName);
-
-        // Step 1: Get existing data from IndexedDB
-        let existingData = await new Promise((resolve, reject) => {
-            const request = store.getAll();
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = (event) => reject(event.target.error);
-        });
-
-        if (!Array.isArray(existingData)) {
-            console.error(`Existing data in ${storeName} is not an array:`, existingData);
-            return;
-        }
-
-        if (existingData.length === 0) {
-            console.log(`No existing data in ${storeName}, adding new data.`);
-            newData.forEach((item) => store.put(item));
-            console.log(`Added new data to ${storeName} in IndexedDB.`);
-            return;
-        }
-
-        const newIds = new Set(newData.map((item) => item.id));
-
-        for (const item of existingData) {
-            if (!newIds.has(item.id)) {
-                store.delete(item.id);
-                console.log(`Deleted ${item.id} from ${storeName}`);
-            }
-        }
-
-        newData.forEach((item) => store.put(item));
-
-        console.log(`Synced ${storeName} in IndexedDB.`);
-    } catch (error) {
-        console.error(`Failed to sync ${storeName}:`, error);
-    }
-};
-
+// Install event - Cache static assets
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        (async () => {
-            const cache = await caches.open(CACHE_NAME);
-            await cache.addAll(STATIC_ASSETS);
-            console.log('Static assets cached');
-
-            try {
-                const offlineResponse = await fetch(OFFLINE_API_URL);
-                const offlineData = await offlineResponse.json();
-                await clearAndAddToDB('offlineData', offlineData);
-
-                const userListResponse = await fetch(LIST_API_URL);
-                const userListData = await userListResponse.json();
-                await clearAndAddToDB('userListData', userListData);
-
-                console.log('API data cached in IndexedDB');
-            } catch (error) {
-                console.warn('Failed to cache API data:', error.message);
-            }
-        })()
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(STATIC_ASSETS);
+        })
     );
 });
 
+// Activate event - Cleanup old caches
 self.addEventListener('activate', (event) => {
+    const cacheWhitelist = [CACHE_NAME];
     event.waitUntil(
-        caches.keys().then((keys) =>
-            Promise.all(
-                keys.map((key) => {
-                    if (key !== CACHE_NAME) {
-                        console.log('Deleting old cache:', key);
-                        return caches.delete(key);
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    if (!cacheWhitelist.includes(cacheName)) {
+                        return caches.delete(cacheName);
                     }
                 })
-            )
-        )
+            );
+        })
     );
 });
 
+// Fetch event - Serve from cache or fetch from network
 self.addEventListener('fetch', (event) => {
     const { request } = event;
 
-    if (request.url.includes('/api/')) {
+    // Handle static asset requests
+    if (STATIC_ASSETS.includes(request.url) || request.url.includes('/images/')) {
+        event.respondWith(
+            caches.match(request).then((cachedResponse) => {
+                return cachedResponse || fetch(request);
+            })
+        );
+    } 
+    // Handle API requests (network-first strategy)
+    else if (request.url.startsWith(OFFLINE_API_URL) || request.url.startsWith(LIST_API_URL)) {
         event.respondWith(
             fetch(request)
-                .then(async (response) => {
+                .then((response) => {
+                    // Cache API responses for offline usage
                     const clonedResponse = response.clone();
-                    const data = await clonedResponse.json();
-
-                    if (request.url.includes(LIST_API_URL)) {
-                        await clearAndSyncDB('userListData', data);
-                    } else if (request.url.includes(OFFLINE_API_URL)) {
-                        await clearAndAddToDB('offlineData', data);
-                    }
-
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(request, clonedResponse);
+                    });
                     return response;
                 })
-                .catch(async () => {
-                    console.warn('Network unavailable. Serving API data from IndexedDB.');
-
-                    // Fallback to IndexedDB
-                    if (request.url.includes(LIST_API_URL)) {
-                        const data = await getAllDataFromDB('userListData');
-                        return new Response(JSON.stringify(data), {
-                            headers: { 'Content-Type': 'application/json' },
-                        });
-                    } else if (request.url.includes(OFFLINE_API_URL)) {
-                        const data = await getAllDataFromDB('offlineData');
-                        return new Response(JSON.stringify(data), {
-                            headers: { 'Content-Type': 'application/json' },
-                        });
-                    }
-
-                    return new Response('Offline content unavailable.', { status: 503 });
+                .catch(() => {
+                    // Return cached response if offline
+                    return caches.match(request).then((cachedResponse) => {
+                        return cachedResponse || new Response('Network error', { status: 408 });
+                    });
                 })
         );
     } else {
+        // Default strategy - Cache first, then network
         event.respondWith(
-            caches.match(request).then((cachedResponse) => cachedResponse || fetch(request))
+            caches.match(request).then((cachedResponse) => {
+                return cachedResponse || fetch(request);
+            })
         );
     }
 });

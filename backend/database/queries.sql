@@ -18,17 +18,17 @@ CREATE TABLE listing (
 -- select * from Userlisting;
 -- DELETE FROM listing;
 
-CREATE TABLE offline (
-    mal_id INTEGER PRIMARY KEY AUTOINCREMENT,  
-    title TEXT NOT NULL,              
-    synopsis TEXT,                
-    episodes INTEGER NOT NULL,   
-    image_path TEXT NOT NULL);
+-- CREATE TABLE offline (
+--     mal_id INTEGER PRIMARY KEY AUTOINCREMENT,  
+--     title TEXT NOT NULL,              
+--     synopsis TEXT,                
+--     episodes INTEGER NOT NULL,   
+--     image_path TEXT NOT NULL);
 
 
 
 
-drop table offline;
+-- drop table offline;
 
 -- UPDATE offline
 -- SET image_path = '';
