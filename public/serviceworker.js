@@ -1,95 +1,3 @@
-// Open or create IndexedDB
-const openDB = () => {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open('animeTrackerDB', 3);
-
-        request.onerror = (event) => reject(event.target.error);
-        request.onsuccess = (event) => resolve(event.target.result);
-
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-
-            // Object store for API GET data (offline support)
-            if (!db.objectStoreNames.contains('offlineData')) {
-                db.createObjectStore('offlineData', { keyPath: 'mal_id' });
-            }
-
-            // Object store for user's list data
-            if (!db.objectStoreNames.contains('userListData')) {
-                db.createObjectStore('userListData', { keyPath: 'id' });
-            }
-
-            // Object store to queue requests for offline sync
-            if (!db.objectStoreNames.contains('syncQueue')) {
-                db.createObjectStore('syncQueue', { autoIncrement: true });
-            }
-
-            console.log('IndexedDB stores created or upgraded');
-        };
-    });
-};
-
-// Add data to a specified store
-const addData = async (storeName, data) => {
-    const db = await openDB();
-    const transaction = db.transaction(storeName, 'readwrite');
-    const store = transaction.objectStore(storeName);
-    store.put(data);
-    return transaction.complete;
-};
-
-// Get all data from a specified store
-const getAllData = async (storeName) => {
-    const db = await openDB();
-    const transaction = db.transaction(storeName, 'readonly');
-    const store = transaction.objectStore(storeName);
-    return store.getAll();
-};
-
-// Delete data by key from a specified store
-const deleteData = async (storeName, key) => {
-    const db = await openDB();
-    const transaction = db.transaction(storeName, 'readwrite');
-    const store = transaction.objectStore(storeName);
-    store.delete(key);
-    return transaction.complete;
-};
-
-// Add API request to sync queue
-const addToSyncQueue = async (request) => {
-    const db = await openDB();
-    const transaction = db.transaction('syncQueue', 'readwrite');
-    const store = transaction.objectStore('syncQueue');
-    store.add(request);
-    console.log('Request added to sync queue:', request);
-    return transaction.complete;
-};
-
-// Process all requests in the sync queue
-const processSyncQueue = async () => {
-    const db = await openDB();
-    const transaction = db.transaction('syncQueue', 'readwrite');
-    const store = transaction.objectStore('syncQueue');
-
-    const requests = await store.getAll();
-
-    for (const req of requests) {
-        try {
-            const response = await fetch(req.url, {
-                method: req.method,
-                headers: req.headers,
-                body: req.body ? JSON.stringify(req.body) : null,
-            });
-            console.log(`Synced ${req.method} request: ${req.url}`);
-            store.delete(req.id); // Remove successfully synced requests
-        } catch (err) {
-            console.warn(`Failed to sync request: ${req.url}`, err);
-        }
-    }
-};
-
-
-
 const CACHE_NAME = 'anime-tracker-cache-v3';
 const STATIC_ASSETS = [
     '/',
@@ -104,8 +12,109 @@ const STATIC_ASSETS = [
 const OFFLINE_API_URL = '/api/offline';
 const LIST_API_URL = '/api/userlist';
 
+// IndexedDB Helpers
+const openDB = () => {
+    const DB_NAME = 'animeTrackerDB';
+    const DB_VERSION = 6;
 
-// Install: Cache static assets and API data
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+        request.onerror = (event) => {
+            console.error('Error opening IndexedDB:', event.target.error);
+            reject(event.target.error);
+        };
+
+        request.onsuccess = (event) => {
+            resolve(event.target.result);
+        };
+
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+
+            // Create object stores if they don't exist
+            if (!db.objectStoreNames.contains('offlineData')) {
+                db.createObjectStore('offlineData', { keyPath: 'mal_id' });
+            }
+            if (!db.objectStoreNames.contains('userListData')) {
+                db.createObjectStore('userListData', { keyPath: 'id' });
+            }
+
+            console.log('IndexedDB upgraded to version', DB_VERSION);
+        };
+    });
+};
+
+const clearAndAddToDB = async (storeName, data) => {
+    try {
+        const db = await openDB();
+        const transaction = db.transaction(storeName, 'readwrite');
+        const store = transaction.objectStore(storeName);
+
+        // Clear existing data (wait for clear to finish)
+        await new Promise((resolve, reject) => {
+            const clearRequest = store.clear();
+            clearRequest.onsuccess = () => resolve();
+            clearRequest.onerror = (event) => reject(event.target.error);
+        });
+
+        console.log(`Cleared ${storeName} in IndexedDB.`);
+
+        // Add new data
+        if (Array.isArray(data)) {
+            data.forEach((item) => store.put(item));
+        } else {
+            store.put(data);
+        }
+
+        console.log(`Added new data to ${storeName} in IndexedDB.`);
+    } catch (error) {
+        console.error(`Failed to update ${storeName}:`, error);
+    }
+};
+
+const clearAndSyncDB = async (storeName, newData) => {
+    try {
+        const db = await openDB();
+        const transaction = db.transaction(storeName, 'readwrite');
+        const store = transaction.objectStore(storeName);
+
+        // Step 1: Get existing data from IndexedDB
+        let existingData = await new Promise((resolve, reject) => {
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = (event) => reject(event.target.error);
+        });
+
+        if (!Array.isArray(existingData)) {
+            console.error(`Existing data in ${storeName} is not an array:`, existingData);
+            return;
+        }
+
+        if (existingData.length === 0) {
+            console.log(`No existing data in ${storeName}, adding new data.`);
+            newData.forEach((item) => store.put(item));
+            console.log(`Added new data to ${storeName} in IndexedDB.`);
+            return;
+        }
+
+        const newIds = new Set(newData.map((item) => item.id));
+
+        for (const item of existingData) {
+            if (!newIds.has(item.id)) {
+                store.delete(item.id);
+                console.log(`Deleted ${item.id} from ${storeName}`);
+            }
+        }
+
+        newData.forEach((item) => store.put(item));
+
+        console.log(`Synced ${storeName} in IndexedDB.`);
+    } catch (error) {
+        console.error(`Failed to sync ${storeName}:`, error);
+    }
+};
+
 self.addEventListener('install', (event) => {
     event.waitUntil(
         (async () => {
@@ -113,118 +122,78 @@ self.addEventListener('install', (event) => {
             await cache.addAll(STATIC_ASSETS);
             console.log('Static assets cached');
 
-            // Fetch and store initial API data in IndexedDB
-            const db = await openDB();
-
-            // Fetch user list data
-            const userListResponse = await fetch(LIST_API_URL).catch(() => null);
-            if (userListResponse) {
-                const userListData = await userListResponse.json();
-                const userListTransaction = db.transaction('userListData', 'readwrite');
-                const userListStore = userListTransaction.objectStore('userListData');
-                userListData.forEach((item) => userListStore.put(item));
-                console.log('User list data cached in IndexedDB');
-            }
-
-            // Fetch offline data
-            const offlineResponse = await fetch(OFFLINE_API_URL).catch(() => null);
-            if (offlineResponse) {
+            try {
+                const offlineResponse = await fetch(OFFLINE_API_URL);
                 const offlineData = await offlineResponse.json();
-                const offlineTransaction = db.transaction('offlineData', 'readwrite');
-                const offlineStore = offlineTransaction.objectStore('offlineData');
-                offlineData.forEach((item) => offlineStore.put(item));
-                console.log('Offline API data cached in IndexedDB');
+                await clearAndAddToDB('offlineData', offlineData);
+
+                const userListResponse = await fetch(LIST_API_URL);
+                const userListData = await userListResponse.json();
+                await clearAndAddToDB('userListData', userListData);
+
+                console.log('API data cached in IndexedDB');
+            } catch (error) {
+                console.warn('Failed to cache API data:', error.message);
             }
         })()
     );
 });
 
-// Activate: Cleanup old caches
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((keys) => {
-            return Promise.all(
-                keys.map((key) => key !== CACHE_NAME && caches.delete(key))
-            );
-        })
+        caches.keys().then((keys) =>
+            Promise.all(
+                keys.map((key) => {
+                    if (key !== CACHE_NAME) {
+                        console.log('Deleting old cache:', key);
+                        return caches.delete(key);
+                    }
+                })
+            )
+        )
     );
 });
 
-// Fetch handler: Cache-first for static, IndexedDB for APIs
 self.addEventListener('fetch', (event) => {
     const { request } = event;
 
-    // Handle API requests
     if (request.url.includes('/api/')) {
-        if (request.method === 'POST' || request.method === 'DELETE' || request.method === 'PUT') {
-            // Offline support for POST/PUT/DELETE
-            event.respondWith(
-                fetch(request.clone())
-                    .catch(async () => {
-                        console.warn('Network unavailable. Saving request to sync queue.');
+        event.respondWith(
+            fetch(request)
+                .then(async (response) => {
+                    const clonedResponse = response.clone();
+                    const data = await clonedResponse.json();
 
-                        const body = await request.clone().json();
-                        await addToSyncQueue({
-                            url: request.url,
-                            method: request.method,
-                            headers: Object.fromEntries(request.headers),
-                            body: body,
+                    if (request.url.includes(LIST_API_URL)) {
+                        await clearAndSyncDB('userListData', data);
+                    } else if (request.url.includes(OFFLINE_API_URL)) {
+                        await clearAndAddToDB('offlineData', data);
+                    }
+
+                    return response;
+                })
+                .catch(async () => {
+                    console.warn('Network unavailable. Serving API data from IndexedDB.');
+
+                    // Fallback to IndexedDB
+                    if (request.url.includes(LIST_API_URL)) {
+                        const data = await getAllDataFromDB('userListData');
+                        return new Response(JSON.stringify(data), {
+                            headers: { 'Content-Type': 'application/json' },
                         });
+                    } else if (request.url.includes(OFFLINE_API_URL)) {
+                        const data = await getAllDataFromDB('offlineData');
+                        return new Response(JSON.stringify(data), {
+                            headers: { 'Content-Type': 'application/json' },
+                        });
+                    }
 
-                        return new Response(
-                            JSON.stringify({ success: true, message: 'Request saved for offline sync.' }),
-                            { headers: { 'Content-Type': 'application/json' } }
-                        );
-                    })
-            );
-        } else if (request.method === 'GET') {
-            // GET: Try network, fallback to IndexedDB
-            event.respondWith(
-                fetch(request)
-                    .then((response) => {
-                        const clone = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-                        return response;
-                    })
-                    .catch(async () => {
-                        console.warn('Serving GET request from IndexedDB.');
-
-                        const db = await openDB();
-                        if (request.url.includes(LIST_API_URL)) {
-                            const transaction = db.transaction('userListData', 'readonly');
-                            const store = transaction.objectStore('userListData');
-                            const data = await store.getAll();
-                            return new Response(JSON.stringify(data), {
-                                headers: { 'Content-Type': 'application/json' },
-                            });
-                        } else if (request.url.includes(OFFLINE_API_URL)) {
-                            const transaction = db.transaction('offlineData', 'readonly');
-                            const store = transaction.objectStore('offlineData');
-                            const data = await store.getAll();
-                            return new Response(JSON.stringify(data), {
-                                headers: { 'Content-Type': 'application/json' },
-                            });
-                        }
-                        return new Response('Offline content unavailable.', { status: 503 });
-                    })
-            );
-        }
+                    return new Response('Offline content unavailable.', { status: 503 });
+                })
+        );
     } else {
-        // Static files: Cache-first strategy
         event.respondWith(
             caches.match(request).then((cachedResponse) => cachedResponse || fetch(request))
         );
-    }
-});
-
-// Listen for online event and process sync queue
-self.addEventListener('online', () => {
-    console.log('Online! Processing sync queue...');
-    processSyncQueue();
-});
-
-self.addEventListener('sync', (event) => {
-    if (event.tag === 'sync-queue') {
-        event.waitUntil(processSyncQueue());
     }
 });
