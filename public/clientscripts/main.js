@@ -1,11 +1,7 @@
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/serviceworker.js')
-        .then(() => {
-            console.log('Service Worker Registered');
-        })
-        .catch((error) => {
-            console.error('Service Worker Registration Failed:', error);
-        });
+        .then(() => console.log('Service Worker registered'))
+        .catch((err) => console.error('Service Worker registration failed:', err));
 }
 
 
@@ -14,7 +10,6 @@ if ('serviceWorker' in navigator) {
 //global variables
 let currentPage = 1;
 let UserQuery = '';
-
 
 
 
@@ -56,6 +51,15 @@ async function fetchAnimeData(query = '', rating = '') {
     }
 }
 
+
+function registerSync() {
+    navigator.serviceWorker.ready
+        .then((registration) => {
+            return registration.sync.register('anime-sync-requests');
+        })
+        .then(() => console.log('Background sync registered!'))
+        .catch((err) => console.error('Background sync failed:', err));
+}
 
 async function offlineFetch(query = '') {
     try {
