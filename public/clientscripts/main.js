@@ -37,6 +37,7 @@ async function fetchAnimeData(query = '', rating = '') {
         } else {
             console.log('User offline, cache fetching in progress...');
             const offlineData = await offlineFetch(query); 
+            
             displayAnime(offlineData); // Display offline data
         }
     } catch (error) {
@@ -48,8 +49,15 @@ async function fetchAnimeData(query = '', rating = '') {
             console.error('Error during data fetching:', error);
         }
     } finally {
-        beforebutton.disabled = currentPage <= 1;
-        nextbutton.disabled = false; 
+
+        if (!navigator.onLine){
+            beforebutton.remove()
+            nextbutton.remove()
+            
+        } else{       
+            beforebutton.disabled = currentPage <= 1;
+            nextbutton.disabled = false; 
+        }
     }
 }
 
