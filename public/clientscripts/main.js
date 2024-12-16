@@ -14,6 +14,7 @@ let UserQuery = '';
 
 
 
+
 // Function to fetch anime data
 async function fetchAnimeData(query = '', rating = '') {
     UserQuery = query || UserQuery;
@@ -240,10 +241,6 @@ function displayAnime(animes) {
         const animeCard = document.createElement('div');
         animeCard.classList.add('anime-card');
         
-        setTimeout(() => {
-            animeCard.classList.add('animate'), 100;
-        })
-
         const animeImage = document.createElement('img');
         const animeEps = document.createElement('p');
         const pathofimage = navigator.onLine ? anime.images.jpg.image_url : anime.image_path; //sets to different paths depending on if the user is offline or online.

@@ -3,6 +3,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 body {
@@ -202,12 +203,16 @@ body {
     }
 }
 
+
+
 /* Personal List */
+
 #personallist {
     list-style-type: none;
     padding: 0;
-    max-height: 800px;
+    max-height: 400px;
     overflow-y: auto;
+
 }
 
 #personallist > li {
@@ -312,6 +317,11 @@ body {
         grid-template-columns: 1fr;
     }
 
+
+    #personallist{
+        max-height: 100px;
+    }
+
     .animelistcontainer {
         max-height: 300px;
     }
@@ -320,21 +330,7 @@ body {
         width: 100%;
     }
 
-    .librarycontainer {
-        max-height: 500px;
-    }
 
-    #before {
-        position: fixed;
-        bottom: 10px;
-        width: calc(50% - 10px);
-        left: 0; /* Align to the left */
-    }
     
-    #next {
-        position: fixed;
-        bottom: 10px;
-        width: calc(50% - 10px);
-        right: 0; /* Align to the right */
-    }
+
 }
