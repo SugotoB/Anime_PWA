@@ -122,6 +122,7 @@ async function displayList() {
 
             // Anime Title
             const animeTitle = document.createElement('h3');
+            animeTitle.classList.add('animeTitle');
             animeTitle.textContent = anime.title;
             animeDiv.appendChild(animeTitle);
 

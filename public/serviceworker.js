@@ -14,16 +14,18 @@ const STATIC_ASSETS = [
 const OFFLINE_API_URL = '/api/offline';
 const LIST_API_URL = '/api/userlist';
 
-// Install event - Cache static assets
+// Install event - Cache static assets and skip waiting
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             return cache.addAll(STATIC_ASSETS);
         })
     );
+    
+    self.skipWaiting();  // Force the waiting service worker to become active immediately
 });
 
-// Activate event - Cleanup old caches
+// Activate event - Cleanup old caches and claim clients
 self.addEventListener('activate', (event) => {
     const cacheWhitelist = [CACHE_NAME];
     event.waitUntil(
@@ -35,6 +37,9 @@ self.addEventListener('activate', (event) => {
                     }
                 })
             );
+        }).then(() => {
+            // Take control of all pages as soon as the service worker is activated
+            return clients.claim();
         })
     );
 });

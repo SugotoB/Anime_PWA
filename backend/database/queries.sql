@@ -1,11 +1,11 @@
-CREATE TABLE listing (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    anime_id INTEGER NOT NULL,
-    title TEXT NOT NULL,
-    description TEXT,
-    anime_episodes INTEGER,
-    user_progress INTEGER NOT NULL DEFAULT 0
-);
+-- CREATE TABLE listing (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     anime_id INTEGER NOT NULL,
+--     title TEXT NOT NULL,
+--     description TEXT,
+--     anime_episodes INTEGER,
+--     user_progress INTEGER NOT NULL DEFAULT 0
+-- );
 
 
 
@@ -26,7 +26,7 @@ CREATE TABLE listing (
 --     image_path TEXT NOT NULL);
 
 
-
+-- 
 
 -- drop table offline;
 
