@@ -4,16 +4,9 @@ if ('serviceWorker' in navigator) {
         .catch((err) => console.error('Service Worker registration failed:', err));
 }
 
-
-
-
-
-//global variables
+// global variables
 let currentPage = 1;
 let UserQuery = '';
-
-
-
 
 // Function to fetch anime data
 async function fetchAnimeData(query = '', rating = '') {
@@ -37,7 +30,6 @@ async function fetchAnimeData(query = '', rating = '') {
         } else {
             console.log('User offline, cache fetching in progress...');
             const offlineData = await offlineFetch(query); 
-            
             displayAnime(offlineData); // Display offline data
         }
     } catch (error) {
@@ -49,25 +41,20 @@ async function fetchAnimeData(query = '', rating = '') {
             console.error('Error during data fetching:', error);
         }
     } finally {
-
-        if (!navigator.onLine){
+        if (!navigator.onLine) {
             beforebutton.remove()
             nextbutton.remove()
-            
-        } else{       
+        } else {
             beforebutton.disabled = currentPage <= 1;
             nextbutton.disabled = false; 
         }
     }
 }
 
-
 async function offlineFetch(query = '') {
     try {
-
         let url = '/api/offline'; 
         const params = [];
-
         if (query) {
             params.push(`q=${encodeURIComponent(query)}`);
         }
@@ -78,7 +65,6 @@ async function offlineFetch(query = '') {
 
         const response = await fetch(url);
         const offlineData = await response.json();
-        
         return offlineData; 
     } catch (error) {
         console.error('Problems fetching offline data:', error.message);
@@ -86,8 +72,7 @@ async function offlineFetch(query = '') {
     }
 }
 
-
-//next and before buttons, increments page number and reloads the anime, taking into account any user queries
+// next and before buttons, increments page number and reloads the anime, taking into account any user queries
 const nextbutton = document.getElementById('next');
 const beforebutton = document.getElementById('before');
 
@@ -103,14 +88,11 @@ beforebutton.addEventListener('click', function() {
     }
 });
 
-
-
-//function for displaying the anime
-
+// function for displaying the anime
 async function displayList() {
     try {
         const response = await fetch('/api/userlist'); // waits for api fetch
-        const userlist = await response.json(); //waits for conversion of data into json format
+        const userlist = await response.json(); // waits for conversion of data into json format
 
         const container = document.getElementById('personallist'); 
         container.innerHTML = ''; // Clear the current list
@@ -131,19 +113,21 @@ async function displayList() {
             progressSection.classList.add('progress-section');
 
             const currentLabel = document.createElement('label');
+            currentLabel.setAttribute('for', `progress-input-${anime.id}`); // Set the 'for' attribute for accessibility
             currentLabel.textContent = 'Progress: ';
             progressSection.appendChild(currentLabel);
 
             const currentInput = document.createElement('input');
             currentInput.type = 'number';
             currentInput.min = 0;
-            currentInput.max = anime.anime_episodes || 0; //sets to 0 if the former value is falsey
-            currentInput.value = anime.user_progress || 0; //sets to 0 if former value is falsey
+            currentInput.max = anime.anime_episodes || 0; // sets to 0 if the former value is falsey
+            currentInput.value = anime.user_progress || 0; // sets to 0 if former value is falsey
             currentInput.classList.add('progress-input');
+            currentInput.id = `progress-input-${anime.id}`; // Set unique id for each input
             progressSection.appendChild(currentInput);
 
             const totalEpisodes = document.createElement('span');
-            totalEpisodes.textContent = ` / ${anime.anime_episodes || 'N/A'}`; //shows anime episodes from database, return N/A if falsey
+            totalEpisodes.textContent = ` / ${anime.anime_episodes || 'N/A'}`; // shows anime episodes from database, return N/A if falsey
             progressSection.appendChild(totalEpisodes);
 
             animeDiv.appendChild(progressSection);
@@ -178,14 +162,12 @@ async function displayList() {
                 }
             });
             
-
-            //update progress
-            
+            // update progress
             currentInput.addEventListener('input', (event) => {
                 const input = event.target;
                 input.value = input.value.replace(/[^0-9]/g, `${anime.user_progress}`); // Remove anything that's not a digit (0-9)
             });
-            
+
             currentInput.addEventListener('change', async (update) => {
                 const newProgress = parseInt(update.target.value, 10);
                 const animeId = anime.id;
@@ -207,7 +189,7 @@ async function displayList() {
                     });
             
                     if (response.ok) {
-                        console.log('Progress updated successfully!');
+                        window.alert('Progress updated successfully!');
                     } else {
                         const errorData = await response.json();
                         console.error('Failed to update progress:', errorData.error);
@@ -218,14 +200,8 @@ async function displayList() {
 
                 displayList()
             });
-            
-
-            
-            
 
             animeDiv.appendChild(deleteButton);
-
-
             listItem.appendChild(animeDiv);
             container.appendChild(listItem);
         });
@@ -234,15 +210,10 @@ async function displayList() {
     }
 }
 
-
-
-
 function displayAnime(animes) {
     const listContainer = document.getElementById('animelist');
-    listContainer.innerHTML = ''; 
+    listContainer.innerHTML = '';  // Clear the container
 
-
-    
     animes.forEach(anime => {
         const animeItem = document.createElement('li');
         animeItem.classList.add('anime-item');
@@ -252,10 +223,9 @@ function displayAnime(animes) {
         
         const animeImage = document.createElement('img');
         const animeEps = document.createElement('p');
-        const pathofimage = navigator.onLine ? anime.images.jpg.image_url : anime.image_path; //sets to different paths depending on if the user is offline or online.
+        const pathofimage = navigator.onLine ? anime.images.jpg.image_url : anime.image_path; // sets to different paths depending on if the user is offline or online.
         
-        animeEps.textContent = `episodes: ${anime.episodes}`
-
+        animeEps.textContent = `episodes: ${anime.episodes}`;
 
         animeImage.src = pathofimage;
         animeImage.alt = anime.title;
@@ -270,9 +240,7 @@ function displayAnime(animes) {
         descriptionButton.textContent = 'View Description';
         descriptionButton.classList.add('description-button');
 
-
         const addbutton = document.createElement('button');
-
         addbutton.innerText = "Add";
         addbutton.classList.add('addbutton');
 
@@ -312,9 +280,6 @@ function displayAnime(animes) {
                     displayList(); // Refresh the list after attempting to add
                 });
         });
-        
-        
-
 
         descriptionButton.addEventListener('click', () => {
             openDescriptionPopup(anime.synopsis);
@@ -325,8 +290,6 @@ function displayAnime(animes) {
         animeCard.appendChild(descriptionButton);
         animeItem.appendChild(animeCard);
         listContainer.appendChild(animeItem);
-        
-
     });
 }
 
@@ -355,18 +318,12 @@ function openDescriptionPopup(description) {
     document.body.appendChild(popup);
 }
 
-
-
-
-
-
 document.querySelector('.search-form').addEventListener('submit', function(e) {
     e.preventDefault();
     const query = document.querySelector('.search-form input').value; //established the query value taken from .search-form class
     fetchAnimeData(query); 
     currentPage = 1;
 });
-
 
 fetchAnimeData();
 displayList();

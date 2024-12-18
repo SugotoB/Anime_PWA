@@ -9,8 +9,8 @@
 body {
     font-family: 'Arial', sans-serif;
     height: 100vh;
-    background-color: #f9f3e6; /* Light tan background */
-    color: #333;
+    background-color: #f1e4b3; /* Light yellow with better contrast */
+    color: #333; /* Darker text for better contrast */
 }
 
 /* Layout Containers */
@@ -32,29 +32,29 @@ body {
     gap: 1rem;
     padding: 1rem;
     flex: 1;
-    background-color: #ffe0b2; /* Light pastel orange */
+    background-color: #ffd4a5; /* Improved contrast pastel orange */
 }
 
 .header {
     padding: 1rem;
-    background-color: #f2e6d9; /* Light pastel tan */
+    background-color: #f6ac00d7; /* Darker pastel tan for better contrast */
     color: #333;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 1rem;
+    height: 10%;
 }
 
 .logo img {
-    height: 3em;
-    width: 3em;
+    height: 80px;
 }
 
 /* Buttons */
 #buttonicon {
     cursor: pointer;
     position: fixed;
-    background-color: #f44336; /* Soft red */
+    background-color: #d32f2f; /* Darker red for higher contrast */
 }
 
 #next, #before {
@@ -70,24 +70,24 @@ body {
 }
 
 #next {
-    background-color: #ffb74d; /* Pastel orange */
+    background-color: #ff7043; /* Improved orange */
 }
 
 #before {
-    background-color: #ff7043; /* Slight orange-red */
+    background-color: #f44336; /* Better contrast red */
 }
 
 #next:hover {
-    background-color: #ff9800; /* Darker pastel orange on hover */
+    background-color: #ff5722; /* Darker orange on hover */
 }
 
 #before:hover {
-    background-color: #e64a19; /* Darker orange-red on hover */
+    background-color: #d32f2f; /* Darker red on hover */
 }
 
 /* Library Section */
 .librarycontainer {
-    background-color: #fff4e6; /* Pastel tan */
+    background-color: #fff0e6; /* Light tan with better contrast */
     border-radius: 5px;
     overflow-y: auto;
     display: flex;
@@ -107,13 +107,13 @@ body {
 .search-form input {
     flex: 1;
     padding: 0.5rem;
-    border: 1px solid #ddd;
+    border: 1px solid #bbb; /* Darker border for better contrast */
     border-radius: 5px 0 0 5px;
 }
 
 .search-form button {
     padding: 0.5rem 1rem;
-    background-color: #ffb74d; /* Pastel orange */
+    background-color: rgb(255, 87, 34); /* More visible orange */
     color: white;
     border: none;
     cursor: pointer;
@@ -122,12 +122,12 @@ body {
 }
 
 .search-form button:hover {
-    background-color: #ff9800; /* Darker pastel orange */
+    background-color: rgb(230, 81, 28); /* Darker orange */
 }
 
 /* Anime List */
 .animelistcontainer {
-    background-color: #ffe0b2; /* Light pastel orange */
+    background-color: #ffa726; /* More visible orange */
     border-radius: 10px;
     width: 100%;
     min-height: 500px;
@@ -149,7 +149,7 @@ body {
 }
 
 .anime-card {
-    background-color: #fff;
+    background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 15px;
@@ -182,14 +182,14 @@ body {
     display: flex;
     flex-direction: column;
     justify-items: center;
-    background-color: grey;
+    background-color: orange; /* Higher contrast background */
 }
 
 /* Buttons within Cards */
 .description-button {
     margin-top: 10px;
     padding: 0.5rem;
-    background-color: #ffb74d; /* Pastel orange */
+    background-color: rgb(255, 87, 34); /* More visible orange */
     color: white;
     border: none;
     cursor: pointer;
@@ -198,7 +198,7 @@ body {
 }
 
 .description-button:hover {
-    background-color: #ff9800; /* Darker pastel orange */
+    background-color: rgb(230, 81, 28); /* Darker orange */
 }
 
 /* Keyframe Animation */
@@ -213,18 +213,21 @@ body {
     }
 }
 
-
-
 /* Personal List */
 
 #personallist {
     list-style-type: none;
+    color: white;
     padding: 0;
-    max-height: 400px;
+    max-height: 600px;
     overflow-y: auto;
     margin-top: 10px;
     border-radius: 10px;
+}
 
+.personallist_container > h1{
+    font-size: 2em;
+    justify-self: center;    
 }
 
 .animeTitle{
@@ -243,7 +246,7 @@ body {
 }
 
 .delete-button{
-    background-color: rgb(241, 191, 111);
+    background-color: rgb(255, 255, 255); /* More visible yellow */
     justify-self: center;
     height: 2rem;
     margin-top: 1%;
@@ -251,9 +254,10 @@ body {
     border-style: none;
     width: 100%;
 }
+
 /* Progress Section */
 .progress-section {
-    background: #ffb74d; /* Pastel orange */
+    background: rgb(255, 87, 34); /* More visible orange */
     border-radius: 5px;
     padding: 0.5rem;
     display: flex;
@@ -262,12 +266,11 @@ body {
 }
 
 .progress-input {
-    background: #ff7043; /* Slight orange-red */
+    background: #ffffff; /* More contrast with input */
     border: none;
     height: 40px;
     width: 80px;
     text-align: center;
-    color: white;
     border-radius: 5px;
 }
 
@@ -324,7 +327,7 @@ body {
 /* Add Button */
 .addbutton {
     height: 30px;
-    background-color: #ffb74d; /* Pastel orange */
+    background-color: rgb(255, 115, 0); /* More visible orange */
     border-radius: 5px;
     border: none;
     width: 50px;
@@ -334,7 +337,7 @@ body {
 }
 
 .addbutton:hover {
-    background-color: #ff9800; /* Darker pastel orange */
+    background-color: rgb(230, 81, 28); /* Darker orange */
 }
 
 /* Responsive Design */
@@ -342,7 +345,6 @@ body {
     .content {
         grid-template-columns: 1fr;
     }
-
 
     #personallist{
         max-height: 100px;
@@ -355,8 +357,4 @@ body {
     .anime-card {
         width: 100%;
     }
-
-
-    
-
 }

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <link rel="stylesheet" href="style.css">
@@ -11,15 +12,21 @@
 
     <div class="main-content">
         <header class="header">
-            <div class="logo"><img src="images/animeicon.png"></div>
+            <div class="logo"><img src="images/animeicon.png" alt="animeicon"></div>
         </header>
 
         <div class="content">
             <div class="librarycontainer">
                 <form action="search" class="search-form">
+
                     <input type="text" id="input_search" placeholder="Type your favourite anime...">
                     <button type="submit">Search</button>
-                </form>
+
+                </form>  
+
+                <label for="input_search"></label>
+                <label for="input_search"></label>
+
 
                 <div class="animelistcontainer">
                     <ul id="animelist">
@@ -35,6 +42,7 @@
             </div>
 
             <div class="personallist_container">
+                <h1>Your List</h1>
                 <ul id="personallist">
                     <!-- User's personal list dynamically rendered here -->
                 </ul>
