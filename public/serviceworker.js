@@ -7,8 +7,8 @@ const STATIC_ASSETS = [
     '/style.css',
     '/clientscripts/main.js',
     '/images/animeicon.png',
-    '/images/animeicon192x192.png',
-    '/images/animeicon512x512.png',
+    '/images/animeicon-192.png',
+    '/images/animeicon-512.png',
     '/manifest.json'
 ];
 
