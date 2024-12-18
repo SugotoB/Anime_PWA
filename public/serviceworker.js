@@ -7,7 +7,9 @@ const STATIC_ASSETS = [
     '/style.css',
     '/clientscripts/main.js',
     '/images/animeicon.png',
-    '/manifest.json',
+    '/images/animeicon192x192.png',
+    '/images/animeicon512x512.png',
+    '/manifest.json'
 ];
 
 // API endpoints for offline support

@@ -1,15 +1,28 @@
 {
   "name": "Anime Tracker",
   "short_name": "AnimeTracker",
+  "description": "Anime tracker for your favourite shows, track your episodes, track what you are watching!",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
   "icons": [
     {
-      "src": "images/animeicon.png",
+      "src": "images/animeicon192x192.png",
       "sizes": "192x192",
       "type": "image/png"
+    },
+    {
+      "src": "images/animeicon512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
-  ]
+  ],
+  "scope": "/",
+  "lang": "en",
+  "orientation": "portrait",
+  "prefer_related_applications": false,
+  "dir": "ltr",
+  "author": "Sugoto Shankar Barua",
+  "version": "1.0.0"
 }
