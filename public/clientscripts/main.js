@@ -1,5 +1,5 @@
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/serviceworker.js')
+    navigator.serviceWorker.register('../serviceworker.js')
         .then(() => console.log('Service Worker registered'))
         .catch((err) => console.error('Service Worker registration failed:', err));
 }
@@ -311,8 +311,8 @@ function openDescriptionPopup(description) {
     const popupText = document.createElement('p');
     popupText.textContent = description || 'No description available.';
     
-    popupContent.appendChild(closeButton);
     popupContent.appendChild(popupText);
+    popupContent.appendChild(closeButton);
     popup.appendChild(popupContent);
       
     document.body.appendChild(popup);

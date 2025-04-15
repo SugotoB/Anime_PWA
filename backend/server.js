@@ -13,7 +13,13 @@ app.use(cors());
 app.use(express.json());
 app.use(parser.urlencoded({extended: true}));
 
+app.use(express.static(path.join(__dirname, '..', 'public', 'pages')));
+app.use(express.static(path.join(__dirname, '..', 'public', 'clientscripts')));
+app.use(express.static(path.join(__dirname, '..', 'public', 'images')));
 app.use(express.static(path.join(__dirname, '..', 'public')));
+
+
+
 
 const db = new sqlite3.Database(path.join(__dirname, 'database', 'ListUser.db'), (err) => {
     if (err) {

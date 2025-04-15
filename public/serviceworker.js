@@ -3,12 +3,9 @@ const CACHE_NAME = 'anime-tracker-cache-v1';
 // Static assets to cache
 const STATIC_ASSETS = [
     '/',
-    '/index.html',
-    '/style.css',
+    '/pages/index.html',
+    '/pages/style.css',
     '/clientscripts/main.js',
-    '/images/animeicon.png',
-    '/images/animeicon-192.png',
-    '/images/animeicon-512.png',
     '/manifest.json'
 ];
 
