@@ -325,5 +325,7 @@ document.querySelector('.search-form').addEventListener('submit', function(e) {
     currentPage = 1;
 });
 
-fetchAnimeData();
-displayList();
+document.addEventListener('DOMContentLoaded', function(){
+    fetchAnimeData();
+    displayList();
+});
