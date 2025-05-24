@@ -1,9 +1,3 @@
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('../serviceworker.js')
-        .then(() => console.log('Service Worker registered'))
-        .catch((err) => console.error('Service Worker registration failed:', err));
-}
-
 // global variables
 let currentPage = 1;
 let UserQuery = '';
@@ -18,8 +12,7 @@ async function fetchAnimeData(query = '', rating = '') {
         ? `https://api.jikan.moe/v4/anime?q=${query}&page=${currentPage}&sfw&rating=${rating}`
         : `https://api.jikan.moe/v4/anime?page=${currentPage}&sfw&rating=${rating}`;
 
-    try {
-        if (navigator.onLine) {
+    try {    
             console.log('User online, using jikan...');
             const response = await fetch(url);
             if (!response.ok) throw new Error(`network response error: ${response.status}`);
@@ -27,11 +20,8 @@ async function fetchAnimeData(query = '', rating = '') {
             const filteredData = data.data.filter(anime => anime.episodes !== null);
             displayAnime(filteredData); // Display fetched data
             console.log('Online fetching successful');
-        } else {
-            console.log('User offline, cache fetching in progress...');
-            const offlineData = await offlineFetch(query); 
-            displayAnime(offlineData); // Display offline data
-        }
+
+
     } catch (error) {
         console.error('Fetch failed:', error);
         if (!navigator.onLine) {
@@ -41,36 +31,13 @@ async function fetchAnimeData(query = '', rating = '') {
             console.error('Error during data fetching:', error);
         }
     } finally {
-        if (!navigator.onLine) {
-            beforebutton.remove()
-            nextbutton.remove()
-        } else {
-            beforebutton.disabled = currentPage <= 1;
-            nextbutton.disabled = false; 
-        }
+
+        beforebutton.disabled = currentPage <= 1;
+        nextbutton.disabled = false; 
+        
     }
 }
 
-async function offlineFetch(query = '') {
-    try {
-        let url = '/api/offline'; 
-        const params = [];
-        if (query) {
-            params.push(`q=${encodeURIComponent(query)}`);
-        }
-
-        if (params.length > 0) {
-            url += `?${params.join('&')}`;
-        }
-
-        const response = await fetch(url);
-        const offlineData = await response.json();
-        return offlineData; 
-    } catch (error) {
-        console.error('Problems fetching offline data:', error.message);
-        return []; 
-    }
-}
 
 // next and before buttons, increments page number and reloads the anime, taking into account any user queries
 const nextbutton = document.getElementById('next');
@@ -223,7 +190,7 @@ function displayAnime(animes) {
         
         const animeImage = document.createElement('img');
         const animeEps = document.createElement('p');
-        const pathofimage = navigator.onLine ? anime.images.jpg.image_url : anime.image_path; // sets to different paths depending on if the user is offline or online.
+        const pathofimage = anime.images.jpg.image_url; 
         
         animeEps.textContent = `episodes: ${anime.episodes}`;
 
