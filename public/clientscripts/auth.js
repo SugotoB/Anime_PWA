@@ -15,13 +15,13 @@ const utils = {
         return emailRegex.test(email);
     },
 
-    // Validate username format
+    // Validate username format (no spaces, only a-zA-Z0-9_)
     isValidUsername: (username) => {
         const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
         return usernameRegex.test(username);
     },
 
-    // Check password strength
+    // Check password strength and requirements
     checkPasswordStrength: (password) => {
         let score = 0;
         let feedback = [];
@@ -115,45 +115,54 @@ const utils = {
     }
 };
 
-// Password visibility toggle
-function togglePassword() {
-    const passwordInput = document.getElementById('password');
-    const eyeIcon = document.querySelector('.toggle-password .eye-icon');
-    
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        eyeIcon.textContent = '🙈';
-    } else {
-        passwordInput.type = 'password';
-        eyeIcon.textContent = '👁️';
+// Utility function to block spaces and disallowed chars
+function blockDisallowedInput(e, type) {
+    let allowed;
+    if (type === 'username') allowed = /^[a-zA-Z0-9_]*$/;
+    else if (type === 'email') allowed = /^[a-zA-Z0-9@._+-]*$/;
+    else allowed = /^[^\s]*$/; // password/confirm: no spaces
+    if (!allowed.test(e.key)) {
+        e.preventDefault();
     }
 }
 
-function toggleConfirmPassword() {
-    const passwordInput = document.getElementById('confirmPassword');
-    const eyeIcon = document.querySelector('.toggle-password .eye-icon');
-    
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        eyeIcon.textContent = '🙈';
-    } else {
-        passwordInput.type = 'password';
-        eyeIcon.textContent = '👁️';
-    }
+// Attach input restrictions
+function attachInputRestrictions() {
+    const usernameFields = document.querySelectorAll('input[name="username"]');
+    usernameFields.forEach(f => {
+        f.addEventListener('keypress', e => blockDisallowedInput(e, 'username'));
+        f.addEventListener('paste', e => {
+            const paste = (e.clipboardData || window.clipboardData).getData('text');
+            if (!/^[a-zA-Z0-9_]*$/.test(paste)) e.preventDefault();
+        });
+    });
+    const emailFields = document.querySelectorAll('input[name="email"]');
+    emailFields.forEach(f => {
+        f.addEventListener('keypress', e => blockDisallowedInput(e, 'email'));
+        f.addEventListener('paste', e => {
+            const paste = (e.clipboardData || window.clipboardData).getData('text');
+            if (!/^[a-zA-Z0-9@._+-]*$/.test(paste)) e.preventDefault();
+        });
+    });
+    const pwFields = document.querySelectorAll('input[type="password"]');
+    pwFields.forEach(f => {
+        f.addEventListener('keypress', e => blockDisallowedInput(e, 'password'));
+        f.addEventListener('paste', e => {
+            const paste = (e.clipboardData || window.clipboardData).getData('text');
+            if (/\s/.test(paste)) e.preventDefault();
+        });
+    });
 }
 
-// Password strength indicator
-function updatePasswordStrength() {
-    const password = document.getElementById('password').value;
-    const strengthFill = document.getElementById('strength-fill');
-    const strengthText = document.getElementById('strength-text');
-    
-    if (!strengthFill || !strengthText) return;
-    
-    const result = utils.checkPasswordStrength(password);
-    
-    strengthFill.className = 'strength-fill ' + result.strength;
-    strengthText.textContent = `Password strength: ${result.strength}`;
+// Show rate limit error
+function showRateLimitError(retryAfter) {
+    let msg = 'You have tried too many times. Please wait';
+    if (retryAfter) {
+        msg += ` ${retryAfter} seconds.`;
+    } else {
+        msg += ' a while.';
+    }
+    utils.showGeneralError(msg);
 }
 
 // Form validation
@@ -173,7 +182,7 @@ function validateLoginForm() {
         utils.showError('username-error', 'Username is required');
         isValid = false;
     } else if (!utils.isValidUsername(username)) {
-        utils.showError('username-error', 'Username must be 3-20 characters, letters, numbers, and underscores only');
+        utils.showError('username-error', 'Username must be 3-20 characters, only letters, numbers, and underscores, no spaces.');
         isValid = false;
     }
     
@@ -209,7 +218,7 @@ function validateSignupForm() {
         utils.showError('username-error', 'Username is required');
         isValid = false;
     } else if (!utils.isValidUsername(username)) {
-        utils.showError('username-error', 'Username must be 3-20 characters, letters, numbers, and underscores only');
+        utils.showError('username-error', 'Username must be 3-20 characters, only letters, numbers, and underscores, no spaces.');
         isValid = false;
     }
     
@@ -223,11 +232,12 @@ function validateSignupForm() {
     }
     
     // Validate password
+    const pwStrength = utils.checkPasswordStrength(password);
     if (!password) {
         utils.showError('password-error', 'Password is required');
         isValid = false;
-    } else if (password.length < 8) {
-        utils.showError('password-error', 'Password must be at least 8 characters long');
+    } else if (pwStrength.score < 4) {
+        utils.showError('password-error', 'Password must be at least 8 characters, include uppercase, lowercase, number, and special character.');
         isValid = false;
     }
     
@@ -241,6 +251,12 @@ function validateSignupForm() {
     }
     
     return isValid;
+}
+
+// Remove password visibility toggle event listeners and DOM elements if present
+function removePasswordToggles() {
+    const toggles = document.querySelectorAll('.toggle-password');
+    toggles.forEach(t => t.remove());
 }
 
 // API calls
@@ -257,13 +273,15 @@ async function loginUser(username, password) {
             }),
             credentials: 'include'
         });
-        
+        if (response.status === 429) {
+            const retry = response.headers.get('Retry-After');
+            showRateLimitError(retry);
+            throw new Error('Rate limited');
+        }
         const data = await response.json();
-        
         if (!response.ok) {
             throw new Error(data.error || 'Login failed');
         }
-        
         return data;
     } catch (error) {
         throw error;
@@ -284,13 +302,15 @@ async function signupUser(username, email, password) {
             }),
             credentials: 'include'
         });
-        
+        if (response.status === 429) {
+            const retry = response.headers.get('Retry-After');
+            showRateLimitError(retry);
+            throw new Error('Rate limited');
+        }
         const data = await response.json();
-        
         if (!response.ok) {
             throw new Error(data.error || 'Signup failed');
         }
-        
         return data;
     } catch (error) {
         throw error;
@@ -351,6 +371,8 @@ function handleSignup(event) {
 
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', function() {
+    removePasswordToggles();
+    attachInputRestrictions();
     // Login form
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
@@ -361,12 +383,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const signupForm = document.getElementById('signupForm');
     if (signupForm) {
         signupForm.addEventListener('submit', handleSignup);
-        
-        // Password strength indicator
-        const passwordInput = document.getElementById('password');
-        if (passwordInput) {
-            passwordInput.addEventListener('input', updatePasswordStrength);
-        }
     }
     
     // Real-time validation
@@ -376,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (this.id === 'username') {
                 const username = this.value.trim();
                 if (username && !utils.isValidUsername(username)) {
-                    utils.showError('username-error', 'Username must be 3-20 characters, letters, numbers, and underscores only');
+                    utils.showError('username-error', 'Username must be 3-20 characters, only letters, numbers, and underscores, no spaces.');
                 } else {
                     utils.clearError('username-error');
                 }
@@ -438,4 +454,26 @@ window.addEventListener('beforeunload', function() {
     passwordInputs.forEach(input => {
         input.value = '';
     });
-}); 
+});
+
+// Remove double warning for delete account
+async function handleDeleteAccount() {
+    const confirmation = confirm('Are you sure you want to delete your account? This action cannot be undone and will permanently delete all your anime data.');
+    if (!confirmation) return;
+    try {
+        const response = await fetch('/api/auth/delete-account', {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        if (response.ok) {
+            alert('Account deleted successfully');
+            window.location.href = '/signup.html';
+        } else {
+            const data = await response.json();
+            alert('Failed to delete account: ' + (data.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Delete account error:', error);
+        alert('Failed to delete account. Please try again.');
+    }
+} 

@@ -21,23 +21,17 @@
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" required 
                            pattern="[a-zA-Z0-9_]{3,20}" 
-                           title="Username must be 3-20 characters, letters, numbers, and underscores only">
+                           title="Username must be 3-20 characters, only letters, numbers, and underscores, no spaces">
                     <span class="error-message" id="username-error"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <div class="password-input">
-                        <input type="password" id="password" name="password" required 
-                               minlength="8" 
-                               title="Password must be at least 8 characters long">
-                        <button type="button" class="toggle-password" onclick="togglePassword()">
-                            <span class="eye-icon">👁️</span>
-                        </button>
-                    </div>
+                    <input type="password" id="password" name="password" required 
+                           minlength="8" 
+                           title="Password must be at least 8 characters long">
                     <span class="error-message" id="password-error"></span>
                 </div>
-
                 <div class="form-group">
                     <button type="submit" class="auth-button" id="loginBtn">
                         <span class="button-text">Sign In</span>
