@@ -136,6 +136,24 @@ function updatePasswordRequirements(password) {
     });
 }
 
+// Function to update password missing requirements display
+function updatePasswordMissing(password) {
+    const missing = [];
+    if (password.length < 8) missing.push('at least 8 characters');
+    if (!/[a-z]/.test(password)) missing.push('lowercase letter');
+    if (!/[A-Z]/.test(password)) missing.push('uppercase letter');
+    if (!/[0-9]/.test(password)) missing.push('number');
+    if (!/[^A-Za-z0-9]/.test(password)) missing.push('special character');
+    const missingDiv = document.getElementById('password-missing');
+    if (missing.length > 0 && password.length > 0) {
+        missingDiv.textContent = 'Missing: ' + missing.join(', ');
+        missingDiv.style.display = 'block';
+    } else {
+        missingDiv.textContent = '';
+        missingDiv.style.display = 'none';
+    }
+}
+
 // Utility function to block spaces and disallowed chars
 function blockDisallowedInput(e, type) {
     let allowed;
@@ -470,19 +488,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordStrength = document.getElementById('password-strength');
     const strengthFill = document.getElementById('strength-fill');
     const strengthText = document.getElementById('strength-text');
-    const passwordRequirements = document.getElementById('password-requirements');
+    const passwordMissing = document.getElementById('password-missing');
     
-    if (passwordInput && passwordStrength && strengthFill && strengthText && passwordRequirements) {
+    if (passwordInput && passwordStrength && strengthFill && strengthText && passwordMissing) {
         passwordInput.addEventListener('focus', function() {
             passwordStrength.style.display = 'block';
-            passwordRequirements.style.display = 'block';
+            passwordMissing.style.display = 'block';
         });
         
         passwordInput.addEventListener('input', function() {
             const password = this.value;
             if (password.length > 0) {
                 passwordStrength.style.display = 'block';
-                passwordRequirements.style.display = 'block';
+                passwordMissing.style.display = 'block';
                 const strength = utils.checkPasswordStrength(password);
                 
                 // Update strength bar
@@ -502,11 +520,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     strengthText.style.color = '#27ae60';
                 }
                 
-                // Update password requirements
-                updatePasswordRequirements(password);
+                // Update password missing requirements
+                updatePasswordMissing(password);
             } else {
                 passwordStrength.style.display = 'none';
-                passwordRequirements.style.display = 'none';
+                passwordMissing.style.display = 'none';
             }
         });
         
@@ -514,7 +532,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Keep indicators visible if there's content
             if (this.value.length === 0) {
                 passwordStrength.style.display = 'none';
-                passwordRequirements.style.display = 'none';
+                passwordMissing.style.display = 'none';
             }
         });
     }
