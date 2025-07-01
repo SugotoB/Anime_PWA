@@ -29,13 +29,13 @@ const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // limit each IP to 100 requests per windowMs
     message: 'Too many requests from this IP, please try again later.',
-    standardHeaders: true,
+    standardHeaders: true,  
     legacyHeaders: false,
 });
 
 // Session configuration
 app.use(session({
-    secret: 'sample session id',
+    secret: 'sample session secret',
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -84,6 +84,8 @@ function requireGuest(req, res, next) {
 }
 
 // Routes
+
+//used for redirecting user to login/signup page
 app.get('/', (req, res) => {
     if (req.session.userId) {
         res.sendFile(path.join(__dirname, '..', 'public', 'pages', 'index.html'));

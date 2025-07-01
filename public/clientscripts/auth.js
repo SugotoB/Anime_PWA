@@ -1,6 +1,3 @@
-// Authentication JavaScript with security features
-
-// Utility functions
 const utils = {
     // Sanitize input to prevent XSS
     sanitizeInput: (input) => {
@@ -114,6 +111,30 @@ const utils = {
         }
     }
 };
+
+// Function to update password requirements display
+function updatePasswordRequirements(password) {
+    const requirements = {
+        'req-length': password.length >= 8,
+        'req-lowercase': /[a-z]/.test(password),
+        'req-uppercase': /[A-Z]/.test(password),
+        'req-number': /[0-9]/.test(password),
+        'req-special': /[^A-Za-z0-9]/.test(password)
+    };
+    
+    Object.keys(requirements).forEach(reqId => {
+        const element = document.getElementById(reqId);
+        const icon = element.querySelector('.requirement-icon');
+        
+        if (requirements[reqId]) {
+            element.classList.add('met');
+            icon.textContent = '√';
+        } else {
+            element.classList.remove('met');
+            icon.textContent = '✕';
+        }
+    });
+}
 
 // Utility function to block spaces and disallowed chars
 function blockDisallowedInput(e, type) {
@@ -444,6 +465,60 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Password strength indicator and requirements
+    const passwordInput = document.getElementById('password');
+    const passwordStrength = document.getElementById('password-strength');
+    const strengthFill = document.getElementById('strength-fill');
+    const strengthText = document.getElementById('strength-text');
+    const passwordRequirements = document.getElementById('password-requirements');
+    
+    if (passwordInput && passwordStrength && strengthFill && strengthText && passwordRequirements) {
+        passwordInput.addEventListener('focus', function() {
+            passwordStrength.style.display = 'block';
+            passwordRequirements.style.display = 'block';
+        });
+        
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            if (password.length > 0) {
+                passwordStrength.style.display = 'block';
+                passwordRequirements.style.display = 'block';
+                const strength = utils.checkPasswordStrength(password);
+                
+                // Update strength bar
+                strengthFill.className = 'strength-fill ' + strength.strength;
+                
+                // Update strength text
+                strengthText.textContent = 'Password strength: ' + strength.strength.charAt(0).toUpperCase() + strength.strength.slice(1);
+                
+                // Update text color based on strength
+                if (strength.strength === 'weak') {
+                    strengthText.style.color = '#e74c3c';
+                } else if (strength.strength === 'fair') {
+                    strengthText.style.color = '#f39c12';
+                } else if (strength.strength === 'good') {
+                    strengthText.style.color = '#f1c40f';
+                } else {
+                    strengthText.style.color = '#27ae60';
+                }
+                
+                // Update password requirements
+                updatePasswordRequirements(password);
+            } else {
+                passwordStrength.style.display = 'none';
+                passwordRequirements.style.display = 'none';
+            }
+        });
+        
+        passwordInput.addEventListener('blur', function() {
+            // Keep indicators visible if there's content
+            if (this.value.length === 0) {
+                passwordStrength.style.display = 'none';
+                passwordRequirements.style.display = 'none';
+            }
+        });
+    }
+    
     // Rate limiting for form submissions
     let submitTimeout;
     const forms = document.querySelectorAll('form');
@@ -457,6 +532,14 @@ document.addEventListener('DOMContentLoaded', function() {
             submitTimeout = setTimeout(() => {
                 submitTimeout = null;
             }, 2000); // 2 second cooldown
+        });
+    });
+
+    // Add this after DOMContentLoaded and before other input event listeners
+    const allInputs = document.querySelectorAll('input');
+    allInputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            this.classList.add('touched');
         });
     });
 });

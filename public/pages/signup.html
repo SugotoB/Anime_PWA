@@ -16,7 +16,7 @@
                 <p>Join Anime Tracker to manage your anime list</p>
             </div>
 
-            <form id="signupForm" class="auth-form">
+            <form id="signupForm" class="auth-form" novalidate>
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" required 
@@ -38,6 +38,37 @@
                     <input type="password" id="password" name="password" required 
                            minlength="8" 
                            title="Password must be at least 8 characters long, include uppercase, lowercase, number, and special character.">
+                    <div class="password-strength" id="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strength-fill"></div>
+                        </div>
+                        <div class="strength-text" id="strength-text"></div>
+                    </div>
+                    <div class="password-requirements" id="password-requirements">
+                        <h4>Password Requirements:</h4>
+                        <ul>
+                            <li id="req-length" class="requirement-item">
+                                <span class="requirement-icon">✕</span>
+                                At least 8 characters
+                            </li>
+                            <li id="req-lowercase" class="requirement-item">
+                                <span class="requirement-icon">✕</span>
+                                Lowercase letter
+                            </li>
+                            <li id="req-uppercase" class="requirement-item">
+                                <span class="requirement-icon">✕</span>
+                                Uppercase letter
+                            </li>
+                            <li id="req-number" class="requirement-item">
+                                <span class="requirement-icon">✕</span>
+                                Number
+                            </li>
+                            <li id="req-special" class="requirement-item">
+                                <span class="requirement-icon">✕</span>
+                                Special character
+                            </li>
+                        </ul>
+                    </div>
                     <span class="error-message" id="password-error"></span>
                 </div>
 
