@@ -114,54 +114,62 @@ async function handleDeleteAccount() {
     }
 }
 
-// Function to fetch anime data
-async function fetchAnimeData(query = '', rating = '') {
-    UserQuery = query || UserQuery;
-    beforebutton.disabled = true; // Disable navigation buttons
-    nextbutton.disabled = true;
-
-    const url = query
-        ? `https://api.jikan.moe/v4/anime?q=${query}&page=${currentPage}&sfw&rating=${rating}`
-        : `https://api.jikan.moe/v4/anime?page=${currentPage}&sfw&rating=${rating}`;
-
-    try {    
-            console.log('User online, using jikan...');
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`network response error: ${response.status}`);
-            const data = await response.json();
-            const filteredData = data.data.filter(anime => anime.episodes !== null);
-            displayAnime(filteredData); // Display fetched data
-            console.log('Online fetching successful');
-
-
-    } catch (error) {
-        console.error('Fetch failed:', error);
-        if (!navigator.onLine) {
-            const offlineData = await offlineFetch(); 
-            displayAnime(offlineData); // Display offline data
-        } else {
-            console.error('Error during data fetching:', error);
-        }
-    } finally {
-
-        beforebutton.disabled = currentPage <= 1;
-        nextbutton.disabled = false; 
-        
-    }
+// Utility to show/hide loading spinner
+function showLoadingSpinner(show) {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) spinner.style.display = show ? 'flex' : 'none';
 }
 
-
-// next and before buttons, increments page number and reloads the anime, taking into account any user queries
-const nextbutton = document.getElementById('next');
-const beforebutton = document.getElementById('before');
-
-// Update current page indicator
+// Update current page indicator and back button state
 function updateCurrentPageIndicator() {
     const currentPageSpan = document.getElementById('current-page');
     if (currentPageSpan) {
         currentPageSpan.textContent = `Page ${currentPage}`;
     }
+    // Update back button state
+    if (currentPage === 1) {
+        beforebutton.classList.add('disabled');
+        beforebutton.disabled = true;
+    } else {
+        beforebutton.classList.remove('disabled');
+        beforebutton.disabled = false;
+    }
 }
+
+// Function to fetch anime data
+async function fetchAnimeData(query = '', rating = '') {
+    UserQuery = query || UserQuery;
+    showLoadingSpinner(true);
+    beforebutton.disabled = true;
+    nextbutton.disabled = true;
+    const url = query
+        ? `https://api.jikan.moe/v4/anime?q=${query}&page=${currentPage}&sfw&rating=${rating}`
+        : `https://api.jikan.moe/v4/anime?page=${currentPage}&sfw&rating=${rating}`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`network response error: ${response.status}`);
+        const data = await response.json();
+        const filteredData = data.data.filter(anime => anime.episodes !== null);
+        displayAnime(filteredData);
+    } catch (error) {
+        console.error('Fetch failed:', error);
+        if (!navigator.onLine) {
+            const offlineData = await offlineFetch();
+            displayAnime(offlineData);
+        } else {
+            console.error('Error during data fetching:', error);
+        }
+    } finally {
+        showLoadingSpinner(false);
+        beforebutton.disabled = currentPage <= 1;
+        nextbutton.disabled = false;
+        updateCurrentPageIndicator();
+    }
+}
+
+// next and before buttons, increments page number and reloads the anime, taking into account any user queries
+const nextbutton = document.getElementById('next');
+const beforebutton = document.getElementById('before');
 
 // Update nextbutton and beforebutton click handlers to call updateCurrentPageIndicator
 nextbutton.addEventListener('click', function() {
