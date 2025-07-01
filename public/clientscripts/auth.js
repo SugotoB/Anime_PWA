@@ -154,15 +154,33 @@ function attachInputRestrictions() {
     });
 }
 
-// Show rate limit error
+let rateLimitInterval = null;
 function showRateLimitError(retryAfter) {
-    let msg = 'You have tried too many times. Please wait';
-    if (retryAfter) {
-        msg += ` ${retryAfter} seconds.`;
-    } else {
-        msg += ' a while.';
+    // Clear any previous interval
+    if (rateLimitInterval) clearInterval(rateLimitInterval);
+    let seconds = parseInt(retryAfter, 10);
+    if (isNaN(seconds) || seconds <= 0) seconds = 60; // fallback
+    const container = document.getElementById('error-container');
+    const messageElement = document.getElementById('error-message');
+    let btn = document.getElementById('loginBtn') || document.getElementById('signupBtn');
+    if (btn) btn.disabled = true;
+    function updateMsg() {
+        if (messageElement) {
+            messageElement.textContent = `Locked out for ${seconds}s`;
+        }
+        if (container) container.style.display = 'block';
     }
-    utils.showGeneralError(msg);
+    updateMsg();
+    rateLimitInterval = setInterval(() => {
+        seconds--;
+        if (seconds > 0) {
+            updateMsg();
+        } else {
+            clearInterval(rateLimitInterval);
+            if (container) container.style.display = 'none';
+            if (btn) btn.disabled = false;
+        }
+    }, 1000);
 }
 
 // Form validation
