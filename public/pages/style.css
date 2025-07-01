@@ -313,18 +313,19 @@ body {
 }
 
 .anime-card {
-    background-color: white;
+    background: #fff;
     border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(229, 57, 53, 0.06);
+    border: 1.5px solid #e53935;
+    padding: 1rem 1rem 1.5rem 1rem;
     width: 100%;
     text-align: center;
     animation: fadeIn 0.6s ease-out forwards;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s, box-shadow 0.3s;
     overflow: hidden;
-    position: relative;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .anime-card:hover {
@@ -384,21 +385,22 @@ body {
 /* Buttons within Cards */
 .description-button {
     margin-top: 0.8rem;
-    padding: 0.6rem;
-    background: linear-gradient(to right, #ff8a00, #da1b60);
-    color: white;
-    border: none;
+    padding: 0.6rem 1.5rem;
+    background: #fff;
+    color: #e53935;
+    border: 1.5px solid #e53935;
     cursor: pointer;
     border-radius: 25px;
-    transition: all 0.3s ease;
     font-weight: 600;
-    font-size: 0.9rem;
-    box-shadow: 0 3px 8px rgba(218, 27, 96, 0.2);
+    font-size: 1rem;
+    box-shadow: none;
+    transition: background 0.2s, color 0.2s;
+    width: 100%;
 }
 
 .description-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(218, 27, 96, 0.3);
+    background: #e53935;
+    color: #fff;
 }
 
 .description-button:active {
@@ -419,12 +421,14 @@ body {
 
 /* Personal List */
 .personallist_container {
-    background: white;
+    background: #fff;
     border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    padding: 1rem 0.5rem;
+    box-shadow: 0 2px 8px rgba(229, 57, 53, 0.06);
+    border: 1.5px solid #e53935;
     display: flex;
     flex-direction: column;
+    margin-bottom: 1rem;
 }
 
 .personallist_container > h1 {
@@ -481,14 +485,15 @@ body {
 }
 
 #personallist > li {
-    margin-top: 1rem;
-    background: #f8f9fa;
+    margin-top: 0.75rem;
+    background: #fff;
     border-radius: 10px;
-    padding: 1rem;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    animation: fadeIn 0.5s ease forwards;
-    border-left: 3px solid #da1b60;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 1px 4px rgba(229, 57, 53, 0.04);
+    border-left: 4px solid #e53935;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 #personallist > li:hover {
@@ -497,23 +502,21 @@ body {
 }
 
 .delete-button {
-    background: linear-gradient(to right, #e53935, #b71c1c);
-    color: white;
-    justify-self: center;
-    height: 2.5rem;
-    margin-top: 0.8rem;
+    background: #e53935;
+    color: #fff;
     border-radius: 25px;
-    border-style: none;
+    border: none;
     width: 100%;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 8px rgba(229, 57, 53, 0.08);
+    transition: background 0.2s;
+    box-shadow: none;
+    margin-top: 0.5rem;
+    padding: 0.7rem 0;
 }
 
 .delete-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(229, 57, 53, 0.15);
+    background: #b71c1c;
 }
 
 .delete-button:active {
@@ -562,27 +565,32 @@ body {
 }
 
 .popup-content {
-    background: white;
-    padding: 2rem;
+    background: #fff;
+    padding: 2rem 2rem 1.5rem 2rem;
     border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(183, 28, 28, 0.10);
+    border: 2px solid #e53935;
     display: flex;
     flex-direction: column;
-    height: 500px;
     max-width: 600px;
     width: 90%;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-    animation: zoomIn 0.3s ease forwards;
+    align-items: center;
 }
 
-@keyframes zoomIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+.popup-title {
+    color: #b71c1c;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    text-align: center;
+}
+
+.current-page-indicator {
+    color: #b71c1c;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0 1rem;
+    vertical-align: middle;
 }
 
 .synopsiscontainer {
@@ -608,26 +616,6 @@ body {
 .synopsiscontainer::-webkit-scrollbar-thumb {
     background: #da1b60;
     border-radius: 10px;
-}
-
-.popup-heading {
-    text-align: center;
-    font-size: 1.5rem;
-    color: #b71c1c;
-    font-weight: 600;
-    position: relative;
-    padding-bottom: 0.8rem;
-}
-
-.popup-heading::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 30%;
-    right: 30%;
-    height: 3px;
-    background: linear-gradient(to right, #ff8a00, #da1b60);
-    border-radius: 3px;
 }
 
 .popup-close {
@@ -675,6 +663,30 @@ body {
 
 .addbutton:active {
     transform: translateY(1px);
+}
+
+/* Anime rating text */
+.anime-rating {
+    color: #b71c1c;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    margin-top: -0.5rem;
+}
+
+/* Add button full width at bottom */
+.addbutton.fullwidth {
+    width: 100%;
+    margin: 1rem 0 0 0;
+    border-radius: 25px;
+    background: #e53935;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: none;
+    transition: background 0.2s;
+}
+.addbutton.fullwidth:hover {
+    background: #b71c1c;
 }
 
 /* Responsive Design */

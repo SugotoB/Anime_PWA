@@ -155,15 +155,26 @@ async function fetchAnimeData(query = '', rating = '') {
 const nextbutton = document.getElementById('next');
 const beforebutton = document.getElementById('before');
 
+// Update current page indicator
+function updateCurrentPageIndicator() {
+    const currentPageSpan = document.getElementById('current-page');
+    if (currentPageSpan) {
+        currentPageSpan.textContent = `Page ${currentPage}`;
+    }
+}
+
+// Update nextbutton and beforebutton click handlers to call updateCurrentPageIndicator
 nextbutton.addEventListener('click', function() {
-    currentPage++;  
-    fetchAnimeData(UserQuery); 
+    currentPage++;
+    fetchAnimeData(UserQuery);
+    updateCurrentPageIndicator();
 });
 
 beforebutton.addEventListener('click', function() {
     if (currentPage > 1) {
-        currentPage--;  
-        fetchAnimeData(UserQuery); 
+        currentPage--;
+        fetchAnimeData(UserQuery);
+        updateCurrentPageIndicator();
     }
 });
 
@@ -295,41 +306,42 @@ async function displayList() {
 
 function displayAnime(animes) {
     const listContainer = document.getElementById('animelist');
-    listContainer.innerHTML = '';  // Clear the container
-
+    listContainer.innerHTML = '';
     animes.forEach(anime => {
         const animeItem = document.createElement('li');
         animeItem.classList.add('anime-item');
-
         const animeCard = document.createElement('div');
         animeCard.classList.add('anime-card');
-        
         const animeImage = document.createElement('img');
         const animeEps = document.createElement('p');
-        const pathofimage = anime.images.jpg.image_url; 
-        
+        const pathofimage = anime.images.jpg.image_url;
         animeEps.textContent = `episodes: ${anime.episodes}`;
-
         animeImage.src = pathofimage;
         animeImage.alt = anime.title;
         animeImage.classList.add('anime-image');
         animeCard.appendChild(animeImage);
-        
         const animeTitle = document.createElement('h3');
         animeTitle.textContent = anime.title;
         animeCard.appendChild(animeTitle);
-        
+        animeCard.appendChild(animeEps);
+        // Add rating under episodes
+        const animeRating = document.createElement('p');
+        animeRating.textContent = `Rating: ${anime.rating || 'N/A'}`;
+        animeRating.classList.add('anime-rating');
+        animeCard.appendChild(animeRating);
         const descriptionButton = document.createElement('button');
         descriptionButton.textContent = 'View Description';
         descriptionButton.classList.add('description-button');
-
+        descriptionButton.addEventListener('click', () => {
+            openDescriptionPopup(anime.synopsis, anime.title);
+        });
+        animeCard.appendChild(descriptionButton);
+        // Add button full width at bottom
         const addbutton = document.createElement('button');
-        addbutton.innerText = "Add";
-        addbutton.classList.add('addbutton');
-
+        addbutton.innerText = 'Add';
+        addbutton.classList.add('addbutton', 'fullwidth');
         addbutton.addEventListener('click', () => {
             addbutton.disabled = true;
-        
             fetch('/api/addinganime', {
                 method: 'POST',
                 headers: {
@@ -339,7 +351,7 @@ function displayAnime(animes) {
                     title: anime.title,
                     description: anime.synopsis,
                     anime_episodes: anime.episodes,
-                    anime_id: anime.mal_id, // mal_id is Jikan's unique identifier
+                    anime_id: anime.mal_id,
                 }),
                 credentials: 'include'
             })
@@ -361,44 +373,36 @@ function displayAnime(animes) {
                 })
                 .finally(() => {
                     addbutton.disabled = false;
-                    displayList(); // Refresh the list after attempting to add
+                    displayList();
                 });
         });
-
-        descriptionButton.addEventListener('click', () => {
-            openDescriptionPopup(anime.synopsis);
-        });
-
-        animeCard.appendChild(animeEps);
         animeCard.appendChild(addbutton);
-        animeCard.appendChild(descriptionButton);
         animeItem.appendChild(animeCard);
         listContainer.appendChild(animeItem);
     });
 }
 
-function openDescriptionPopup(description) {
+function openDescriptionPopup(description, title) {
     const popup = document.createElement('div');
     popup.classList.add('popup');
-    
     const popupContent = document.createElement('div');
     popupContent.classList.add('popup-content');
-    
+    // Add title at the top
+    const popupTitle = document.createElement('h2');
+    popupTitle.classList.add('popup-title');
+    popupTitle.textContent = title || 'Description';
+    popupContent.appendChild(popupTitle);
     const closeButton = document.createElement('button');
     closeButton.textContent = 'Close';
     closeButton.classList.add('popup-close');
-    
     closeButton.addEventListener('click', () => {
         document.body.removeChild(popup);
     });
-    
     const popupText = document.createElement('p');
     popupText.textContent = description || 'No description available.';
-    
     popupContent.appendChild(popupText);
     popupContent.appendChild(closeButton);
     popup.appendChild(popupContent);
-      
     document.body.appendChild(popup);
 }
 
@@ -415,11 +419,10 @@ document.addEventListener('DOMContentLoaded', async function(){
     if (!isAuthenticated) {
         return;
     }
-    
     // Initialize user menu
     initUserMenu();
-    
     // Load data
     fetchAnimeData();
     displayList();
+    updateCurrentPageIndicator();
 });
