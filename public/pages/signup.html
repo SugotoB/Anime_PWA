@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Anime Tracker</title>
+    <link rel="stylesheet" href="auth-style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <img src="/animeicon.png" alt="Anime Tracker Logo" class="auth-logo">
+                <h1>Create Account</h1>
+                <p>Join Anime Tracker to manage your anime list</p>
+            </div>
+
+            <form id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required 
+                           pattern="[a-zA-Z0-9_]{3,20}" 
+                           title="Username must be 3-20 characters, letters, numbers, and underscores only">
+                    <span class="error-message" id="username-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required 
+                           pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                           title="Please enter a valid email address">
+                    <span class="error-message" id="email-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-input">
+                        <input type="password" id="password" name="password" required 
+                               minlength="8" 
+                               title="Password must be at least 8 characters long">
+                        <button type="button" class="toggle-password" onclick="togglePassword()">
+                            <span class="eye-icon">👁️</span>
+                        </button>
+                    </div>
+                    <div class="password-strength" id="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strength-fill"></div>
+                        </div>
+                        <span class="strength-text" id="strength-text">Password strength</span>
+                    </div>
+                    <span class="error-message" id="password-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="password-input">
+                        <input type="password" id="confirmPassword" name="confirmPassword" required 
+                               minlength="8">
+                        <button type="button" class="toggle-password" onclick="toggleConfirmPassword()">
+                            <span class="eye-icon">👁️</span>
+                        </button>
+                    </div>
+                    <span class="error-message" id="confirmPassword-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="auth-button" id="signupBtn">
+                        <span class="button-text">Create Account</span>
+                        <span class="loading-spinner" style="display: none;">⏳</span>
+                    </button>
+                </div>
+
+                <div class="auth-links">
+                    <p>Already have an account? <a href="login.html">Sign in here</a></p>
+                </div>
+            </form>
+
+            <div id="error-container" class="error-container" style="display: none;">
+                <p id="error-message"></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/auth.js"></script>
+</body>
+</html> 

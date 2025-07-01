@@ -1,81 +1,42 @@
--- CREATE TABLE listing (
---     id INTEGER PRIMARY KEY AUTOINCREMENT,
---     anime_id INTEGER NOT NULL,
---     title TEXT NOT NULL,
---     description TEXT,
---     anime_episodes INTEGER,
---     user_progress INTEGER NOT NULL DEFAULT 0
--- );
+-- Drop existing tables if they exist
+DROP TABLE IF EXISTS listing;
+DROP TABLE IF EXISTS offline;
+DROP TABLE IF EXISTS users;
 
+-- Create users table for authentication
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_login DATETIME,
+    is_active BOOLEAN DEFAULT 1
+);
 
+-- Create updated listing table with user_id foreign key
+CREATE TABLE listing (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    anime_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    anime_episodes INTEGER,
+    user_progress INTEGER NOT NULL DEFAULT 0,
+    added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
--- drop table listing;
+-- Create offline anime table
+CREATE TABLE offline (
+    mal_id INTEGER PRIMARY KEY AUTOINCREMENT,  
+    title TEXT NOT NULL,              
+    synopsis TEXT,                
+    episodes INTEGER NOT NULL,   
+    image_path TEXT NOT NULL
+);
 
-
-
-
--- drop TABLE listing;
--- select * from Userlisting;
--- DELETE FROM listing;
-
--- CREATE TABLE offline (
---     mal_id INTEGER PRIMARY KEY AUTOINCREMENT,  
---     title TEXT NOT NULL,              
---     synopsis TEXT,                
---     episodes INTEGER NOT NULL,   
---     image_path TEXT NOT NULL);
-
-
--- 
-
--- drop table offline;
-
--- UPDATE offline
--- SET image_path = '';
-
-
--- INSERT INTO offline (title, synopsis, episodes, image_path)
--- VALUES 
--- ('Naruto', 
---  'A young ninja who seeks recognition from his peers and dreams of becoming the Hokage.', 
---  220, 
---  'images/naruto.jpg');
-
--- INSERT INTO offline (title, synopsis, episodes, image_path)
--- VALUES 
--- ('Attack on Titan', 
---  'Humans fight for survival against man-eating giants known as Titans.', 
---  87, 
---  'images/attack_on_titan.jpg');
-
--- INSERT INTO offline (title, synopsis, episodes, image_path)
--- VALUES 
--- ('Death Note', 
---  'A high school student discovers a notebook that allows him to kill anyone by writing their name in it.', 
---  37, 
---  'images/death_note.jpg');
-
--- INSERT INTO offline (title, synopsis, episodes, image_path)
--- VALUES 
--- ('One Piece', 
---  'Follow the adventures of Monkey D. Luffy and his pirate crew in search of the ultimate treasure, the One Piece.', 
---  1070, 
---  'images/one_piece.jpg');
-
--- INSERT INTO offline (title, synopsis, episodes, image_path)
--- VALUES 
--- ('Demon Slayer', 
---  'A young boy joins a secret group of demon slayers after his family is slaughtered by demons.', 
---  26, 
---  'images/demon_slayer.jpg');
-
--- INSERT INTO offline (title, synopsis, episodes, image_path)
--- VALUES 
--- ('My Hero Academia', 
---  'In a world where nearly everyone has superpowers, a boy without powers dreams of becoming a hero.', 
---  138, 
---  'images/my_hero_academia.jpg');
-
+-- Insert sample offline anime data
 INSERT INTO offline (title, synopsis, episodes, image_path)
 VALUES 
 ('a', 
@@ -103,7 +64,6 @@ VALUES
  138, 
  'images/animeicon.png'),
 
-
  ('f', 
  'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
  138, 
@@ -114,25 +74,20 @@ VALUES
  138, 
  'images/animeicon.png'),
 
-
  ('h', 
  'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
  138, 
  'images/animeicon.png'),
-
 
  ('i', 
  'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
  138, 
  'images/animeicon.png'),
 
-
-
  ('j', 
  'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
  138, 
  'images/animeicon.png'),
-
 
  ('k', 
  'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
@@ -147,7 +102,11 @@ VALUES
  ('m', 
  'In a world where nearly everyone has superpowers, a boy chinese powers dreams of becoming a hero.', 
  138, 
- 'images/animeicon.png')
- ;
+ 'images/animeicon.png');
+
+-- Create indexes for better performance
+CREATE INDEX idx_listing_user_id ON listing(user_id);
+CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX idx_users_email ON users(email);
 
  

@@ -1,6 +1,118 @@
 // global variables
 let currentPage = 1;
 let UserQuery = '';
+let currentUser = null;
+
+// Check authentication status
+async function checkAuth() {
+    try {
+        const response = await fetch('/api/auth/check', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (!data.authenticated) {
+            window.location.href = '/login.html';
+            return false;
+        }
+        
+        currentUser = data.user;
+        updateUserDisplay();
+        return true;
+    } catch (error) {
+        console.error('Auth check failed:', error);
+        window.location.href = '/login.html';
+        return false;
+    }
+}
+
+// Update user display
+function updateUserDisplay() {
+    const usernameDisplay = document.getElementById('username-display');
+    if (usernameDisplay && currentUser) {
+        usernameDisplay.textContent = `Welcome, ${currentUser.username}!`;
+    }
+}
+
+// User menu functionality
+function initUserMenu() {
+    const menuBtn = document.getElementById('user-menu-btn');
+    const dropdown = document.getElementById('user-dropdown');
+    const logoutBtn = document.getElementById('logout-btn');
+    const deleteAccountBtn = document.getElementById('delete-account-btn');
+
+    if (menuBtn && dropdown) {
+        menuBtn.addEventListener('click', () => {
+            dropdown.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
+
+    if (deleteAccountBtn) {
+        deleteAccountBtn.addEventListener('click', handleDeleteAccount);
+    }
+}
+
+// Handle logout
+async function handleLogout() {
+    try {
+        const response = await fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+        
+        if (response.ok) {
+            window.location.href = '/login.html';
+        } else {
+            console.error('Logout failed');
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+    }
+}
+
+// Handle delete account
+async function handleDeleteAccount() {
+    const confirmation = confirm('Are you sure you want to delete your account? This action cannot be undone and will permanently delete all your anime data.');
+    
+    if (!confirmation) {
+        return;
+    }
+
+    const finalConfirmation = confirm('This is your final warning. All your data will be permanently deleted. Are you absolutely sure?');
+    
+    if (!finalConfirmation) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/auth/delete-account', {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        
+        if (response.ok) {
+            alert('Account deleted successfully');
+            window.location.href = '/signup.html';
+        } else {
+            const data = await response.json();
+            alert('Failed to delete account: ' + (data.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Delete account error:', error);
+        alert('Failed to delete account. Please try again.');
+    }
+}
 
 // Function to fetch anime data
 async function fetchAnimeData(query = '', rating = '') {
@@ -58,7 +170,9 @@ beforebutton.addEventListener('click', function() {
 // function for displaying the anime
 async function displayList() {
     try {
-        const response = await fetch('/api/userlist'); // waits for api fetch
+        const response = await fetch('/api/userlist', {
+            credentials: 'include'
+        }); // waits for api fetch
         const userlist = await response.json(); // waits for conversion of data into json format
 
         const container = document.getElementById('personallist'); 
@@ -115,6 +229,7 @@ async function displayList() {
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({ id: anime.id }),
+                        credentials: 'include'
                     });
             
                     if (response.ok) {
@@ -153,6 +268,7 @@ async function displayList() {
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({ id: animeId, user_progress: newProgress }),
+                        credentials: 'include'
                     });
             
                     if (response.ok) {
@@ -225,6 +341,7 @@ function displayAnime(animes) {
                     anime_episodes: anime.episodes,
                     anime_id: anime.mal_id, // mal_id is Jikan's unique identifier
                 }),
+                credentials: 'include'
             })
                 .then(async response => {
                     if (!response.ok) {
@@ -292,7 +409,17 @@ document.querySelector('.search-form').addEventListener('submit', function(e) {
     currentPage = 1;
 });
 
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', async function(){
+    // Check authentication first
+    const isAuthenticated = await checkAuth();
+    if (!isAuthenticated) {
+        return;
+    }
+    
+    // Initialize user menu
+    initUserMenu();
+    
+    // Load data
     fetchAnimeData();
     displayList();
 });
