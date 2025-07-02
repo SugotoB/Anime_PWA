@@ -2,6 +2,7 @@
 let currentPage = 1;
 let UserQuery = '';
 let currentUser = null;
+let lastVisiblePage = 1; // Track the last page from API
 
 // Check authentication status
 async function checkAuth() {
@@ -137,6 +138,14 @@ function updateCurrentPageIndicator() {
         beforebutton.classList.remove('disabled');
         beforebutton.disabled = false;
     }
+    // Update next button state
+    if (currentPage >= lastVisiblePage) {
+        nextbutton.classList.add('disabled');
+        nextbutton.disabled = true;
+    } else {
+        nextbutton.classList.remove('disabled');
+        nextbutton.disabled = false;
+    }
 }
 
 // Function to fetch anime data
@@ -152,20 +161,27 @@ async function fetchAnimeData(query = '', rating = '') {
         const response = await fetch(url);
         if (!response.ok) throw new Error(`network response error: ${response.status}`);
         const data = await response.json();
+        // Store last page from API response
+        if (data.pagination && data.pagination.last_visible_page) {
+            lastVisiblePage = data.pagination.last_visible_page;
+        } else {
+            lastVisiblePage = 1;
+        }
         const filteredData = data.data.filter(anime => anime.episodes !== null);
         displayAnime(filteredData);
     } catch (error) {
         console.error('Fetch failed:', error);
-        if (!navigator.onLine) {
-            const offlineData = await offlineFetch();
-            displayAnime(offlineData);
-        } else {
-            console.error('Error during data fetching:', error);
-        }
     } finally {
         showLoadingSpinner(false);
         beforebutton.disabled = currentPage <= 1;
-        nextbutton.disabled = false;
+        // Disable next button if on last page
+        if (currentPage >= lastVisiblePage) {
+            nextbutton.classList.add('disabled');
+            nextbutton.disabled = true;
+        } else {
+            nextbutton.classList.remove('disabled');
+            nextbutton.disabled = false;
+        }
         updateCurrentPageIndicator();
     }
 }
@@ -176,9 +192,11 @@ const beforebutton = document.getElementById('before');
 
 // Update nextbutton and beforebutton click handlers to call updateCurrentPageIndicator
 nextbutton.addEventListener('click', function() {
-    currentPage++;
-    fetchAnimeData(UserQuery);
-    updateCurrentPageIndicator();
+    if (currentPage < lastVisiblePage) {
+        currentPage++;
+        fetchAnimeData(UserQuery);
+        updateCurrentPageIndicator();
+    }
 });
 
 beforebutton.addEventListener('click', function() {

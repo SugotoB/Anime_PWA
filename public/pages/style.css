@@ -841,3 +841,14 @@ body {
     background: #e0e0e0 !important;
     color: #bdbdbd !important;
 }
+#next.disabled {
+    background: #e0e0e0 !important;
+    color: #bdbdbd !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+#next.disabled:hover, #next.disabled:active {
+    background: #e0e0e0 !important;
+    color: #bdbdbd !important;
+}
