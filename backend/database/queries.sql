@@ -14,6 +14,8 @@ CREATE TABLE users (
     is_active BOOLEAN DEFAULT 1
 );
 
+DELETE FROM users WHERE id = 1
+
 -- Create updated listing table with user_id foreign key
 CREATE TABLE listing (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -29,10 +29,13 @@ async function checkAuth() {
 // Update user display
 function updateUserDisplay() {
     const usernameDisplay = document.getElementById('username-display');
-    if (usernameDisplay && currentUser) {
+    const listDisplay  = document.getElementById('username_list_display');
+    if (usernameDisplay && currentUser && listDisplay) {
         usernameDisplay.textContent = `Welcome, ${currentUser.username}!`;
+        listDisplay.textContent = `${currentUser.username}'s AniLog`
     }
 }
+
 
 // User menu functionality
 function initUserMenu() {
@@ -192,6 +195,7 @@ async function displayList() {
         const response = await fetch('/api/userlist', {
             credentials: 'include'
         }); // waits for api fetch
+        
         const userlist = await response.json(); // waits for conversion of data into json format
 
         const container = document.getElementById('personallist'); 
@@ -315,6 +319,11 @@ async function displayList() {
 function displayAnime(animes) {
     const listContainer = document.getElementById('animelist');
     listContainer.innerHTML = '';
+
+    if(Object.keys(animes).length === 0){
+        listContainer.innerHTML = 'We could not find any anime matching your search.'
+        return;
+    }
     animes.forEach(anime => {
         const animeItem = document.createElement('li');
         animeItem.classList.add('anime-item');
